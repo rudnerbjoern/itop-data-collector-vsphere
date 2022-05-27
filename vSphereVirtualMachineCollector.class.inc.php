@@ -426,33 +426,6 @@ class vSphereVirtualMachineCollector extends ConfigurableCollector
 		return true;
 	}
 
-	// date control - maybe available elsewhere ?
-	function s_checkdate($dte_in)
-	{
-		$dte_out = '0000-00-00';
-		if (preg_match('/^2[0-9]{3}-[0-1][0-9]-[0-3][0-9]$/', $dte_in)) {
-			if (checkdate(substr($dte_in, 5, 2), substr($dte_in, 8, 2), substr($dte_in, 0, 4))) {
-				$dte_out = $dte_in;
-			}
-		}
-		return $dte_out;
-	}
-	// specific : set the location based on the S_SITE attribute
-	// RDE or DC2 -> 'zayo zColo'
-	// DC1 -> 'Equinix PA6'
-	// Any other value -> ''
-	function s_set_location($site)
-	{
-		$s_site = '';
-		if ((strtoupper($site) == 'RDE') or (strtoupper($site) == 'DC2')) {
-			$s_site = 'DC2 - zayo zColo';
-		}
-		if (strtoupper($site) == 'DC1') {
-			$s_site = 'DC1 - Equinix PA6';
-		}
-		return $s_site;
-	}
-
 	public function Fetch()
 	{
 		if ($this->idx < count(static::$aVMInfos)) {
@@ -476,24 +449,12 @@ class vSphereVirtualMachineCollector extends ConfigurableCollector
 			'ram' => $aVM['ram'],
 			'cpu' => ((int)$aVM['cpu']),
 			'managementip' => $aVM['managementip'],
-			'move2production' => self::s_checkdate($aVM['CA-S_DATECREAT']),
 			'osfamily_id' => $aVM['osfamily_id'],
 			'logicalvolumes_list' => implode('|', $aDS),
 			'osversion_id' => $aVM['osversion_id'],
 			'virtualhost_id' => $aVM['virtualhost_id'],
 			'description' => str_replace(array("\n", "\r"), ' ', $aVM['description']),
 			'S_UUID' => strtolower($aVM['S_UUID']),
-			'S_FUNCTION' => $aVM['CA-S_FONCTION'],
-			'S_CREATOR' => $aVM['CA-S_CREATEUR'],
-			'S_Contact_1' => $aVM['CA-S_CONTACT_1'],
-			'S_Contact_2' => $aVM['CA-S_CONTACT_2'],
-			'S_Comment' => $aVM['CA-S_COMMENT'],
-			'S_Usage' => $aVM['CA-S_PLATEFORME'],
-			'S_Project' => $aVM['CA-S_PROJET'],
-			'S_Template' => $aVM['CA-S_TEMPLATE'],
-			'S_Backup' => $aVM['CA-S_SVG_API'] . " / " . $aVM['CA-S_SVG_API_MODE'] . " / " . $aVM['CA-S_SVG_API_TYPE'],
-			'S_EndOfLife' => self::s_checkdate($aVM['CA-S_DATEFINVIE']),
-			'location_id' => self::s_set_location($aVM['CA-S_SITE']),
 			'power_status' => $aVM['powerState'],
 			'vcenter' => $aVM['vcenter'],
 		);
