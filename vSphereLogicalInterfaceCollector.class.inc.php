@@ -14,7 +14,7 @@
 //   You should have received a copy of the GNU Affero General Public License
 //   along with this application. If not, see <http://www.gnu.org/licenses/>
 
-class vSphereLogicalInterfaceCollector extends Collector
+class vSphereLogicalInterfaceCollector extends ConfigurableCollector
 {
 	protected $idx;
 
@@ -39,10 +39,11 @@ class vSphereLogicalInterfaceCollector extends Collector
 				$aInterfaces = $oVM['interfaces'];
 				foreach ($aInterfaces as $oInterface) {
 					$sMac = $oInterface['mac'];
-					Utils::Log(LOG_DEBUG, 'Reading interface information related to MAC @: ' . $sMac);
+					$sName = $oInterface['network'];
+					Utils::Log(LOG_DEBUG, 'Reading interface information related to MAC @: ' . $sMac . ' Name: ' . $sName);
 					$aLogicalInterfaces[] = array(
 						'macaddress' => $sMac,
-						'name' => $oInterface['network'],
+						'name' => $sName,
 						'virtualmachine_orgid' => $oVM['org_id'],
 						'virtualmachine_id' => $oVM['name'],
 						'ip' => $oInterface['ip'],
