@@ -56,6 +56,10 @@
     <pattern>/Microsoft Windows XP Professional/Windows XP Professional</pattern>
     <pattern>/Microsoft Windows 7/Windows 7</pattern>
     <pattern>/Microsoft Windows 10/Windows 10</pattern>
+    <pattern>/Debian GNU/Linux (\d+) /Debian Linux %2$s</pattern>
+    <pattern>/CentOS 8/CentOS 8</pattern>
+    <pattern>|CentOS 4/5/6|CentOS 4/5/6</pattern>
+    <pattern>|CentOS 4/5 or later|CentOS 4/5 or later</pattern>
     <pattern>/.*/%1$s</pattern>
   </os_version_mapping>
   <brand_mapping type="array">
