@@ -40,6 +40,9 @@ class vSphereLogicalInterfaceCollector extends ConfigurableCollector
 				foreach ($aInterfaces as $oInterface) {
 					$sMac = $oInterface['mac'];
 					$sName = $oInterface['network'];
+					if (empty($sName)) {
+						$sName = 'unknown';
+					}
 					Utils::Log(LOG_DEBUG, 'Reading interface information related to MAC @: ' . $sMac . ' Name: ' . $sName);
 					$aLogicalInterfaces[] = array(
 						'macaddress' => $sMac,
