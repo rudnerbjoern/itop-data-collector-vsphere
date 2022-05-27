@@ -21,27 +21,20 @@ class vSphereIPv6AddressCollector extends Collector
 
 	static public function GetIPv6Addresses()
 	{
-		if (self::$aIPv6Addresses === null)
-		{
+		if (self::$aIPv6Addresses === null) {
 			$sDefaultOrg = Utils::GetConfigurationValue('default_org_id');
 			$aTeemIpOptions = Utils::GetConfigurationValue('teemip_options', array('no'));
 
-			if ($aTeemIpOptions['collect_ips'] == 'no')
-			{
+			if ($aTeemIpOptions['collect_ips'] == 'no') {
 				self::$aIPv6Addresses = array();
-			}
-			else
-			{
+			} else {
 				$sDefaulIpStatus = $aTeemIpOptions['default_ip_status'];
 				$aVMs = vSphereVirtualMachineTeemIpCollector::CollectVMInfos();
-				foreach($aVMs as $oVM)
-				{
+				foreach ($aVMs as $oVM) {
 					$sIP = $oVM['managementip_id'];
-					if ($sIP != '')
-					{
-						if (strpos($sIP, ':') !== false)
-						{
-							Utils::Log(LOG_DEBUG, 'IPv6 Address: '.$sIP);
+					if ($sIP != '') {
+						if (strpos($sIP, ':') !== false) {
+							Utils::Log(LOG_DEBUG, 'IPv6 Address: ' . $sIP);
 							$sShortName = explode('.', $oVM['short_name'])[0];  // Remove chars after '.', if any
 							self::$aIPv6Addresses[] = array(
 								'id' => $sIP,
@@ -55,14 +48,11 @@ class vSphereIPv6AddressCollector extends Collector
 				}
 
 				$aServers = vSphereServerTeemIpCollector::CollectServerInfos();
-				foreach($aServers as $oServer)
-				{
+				foreach ($aServers as $oServer) {
 					$sIP = $oServer['managementip_id'];
-					if ($sIP != '')
-					{
-						if (strpos($sIP, ':') !== false)
-						{
-							Utils::Log(LOG_DEBUG, 'IPv4 Address: '.$sIP);
+					if ($sIP != '') {
+						if (strpos($sIP, ':') !== false) {
+							Utils::Log(LOG_DEBUG, 'IPv4 Address: ' . $sIP);
 							self::$aIPv6Addresses[] = array(
 								'id' => $sIP,
 								'ip' => $sIP,
@@ -74,26 +64,20 @@ class vSphereIPv6AddressCollector extends Collector
 					}
 				}
 
-				if ($aTeemIpOptions['manage_logical_interfaces'] == 'yes')
-				{
+				if ($aTeemIpOptions['manage_logical_interfaces'] == 'yes') {
 					$aLnkInterfaceIPAddressses = vSpherelnkIPInterfaceToIPAddressCollector::GetLnks();
-					foreach($aLnkInterfaceIPAddressses as $oLnkInterfaceIPAddresss)
-					{
+					foreach ($aLnkInterfaceIPAddressses as $oLnkInterfaceIPAddresss) {
 						$sIP = $oLnkInterfaceIPAddresss['ipaddress_id'];
-						if ($sIP != '')
-						{
-							if (strpos($sIP, ':') !== false)
-							{
+						if ($sIP != '') {
+							if (strpos($sIP, ':') !== false) {
 								// Check if address is already listed as it may be that vSphere reported it as management IP too
 								// Don't register duplicates otherwise
 								$sKey = false;
-								if (!empty(self::$aIPv6Addresses))
-								{
+								if (!empty(self::$aIPv6Addresses)) {
 									$sKey = array_search($sIP, array_column(self::$aIPv6Addresses, 'ip'));
 								}
-								if ($sKey === false)
-								{
-									Utils::Log(LOG_DEBUG, 'IPv6 Address: '.$sIP);
+								if ($sKey === false) {
+									Utils::Log(LOG_DEBUG, 'IPv6 Address: ' . $sIP);
 									self::$aIPv6Addresses[] = array(
 										'id' => $sIP,
 										'ip' => $sIP,
@@ -124,8 +108,7 @@ class vSphereIPv6AddressCollector extends Collector
 
 	public function Fetch()
 	{
-		if ($this->idx < count(self::$aIPv6Addresses))
-		{
+		if ($this->idx < count(self::$aIPv6Addresses)) {
 			$aIPv6Addresses = self::$aIPv6Addresses[$this->idx++];
 			return array(
 				'primary_key' => $aIPv6Addresses['id'],

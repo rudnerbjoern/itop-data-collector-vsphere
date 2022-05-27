@@ -58,7 +58,6 @@ class vSphereServerCollector extends ConfigurableCollector
 			'osversion_id' => $aHyperV['osversion_id'],
 			'cpu' => $aHyperV['cpu'],
 			'ram' => $aHyperV['ram'],
-			'managementip' => $aHyperV['managementip'],
 		);
 
 		// Add the custom fields (if any)

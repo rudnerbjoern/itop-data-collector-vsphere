@@ -28,21 +28,18 @@ class vSphereLogicalInterfaceCollector extends Collector
 
 	static public function GetLogicalInterfaces()
 	{
-		if (self::$aLogicalInterfaces === null)
-		{
+		if (self::$aLogicalInterfaces === null) {
 			$aTeemIpOptions = Utils::GetConfigurationValue('teemip_options', array());
-			$bCollectIPv6Addresses = ($aTeemIpOptions['manage_ipv6'] == 'yes') ? true :false;
+			$bCollectIPv6Addresses = ($aTeemIpOptions['manage_ipv6'] == 'yes') ? true : false;
 
 			$aVMs = vSphereVirtualMachineTeemIpCollector::GetVMs();
 
 			$aLogicalInterfaces = array();
-			foreach($aVMs as $oVM)
-			{
+			foreach ($aVMs as $oVM) {
 				$aInterfaces = $oVM['interfaces'];
-				foreach ($aInterfaces AS $oInterface)
-				{
+				foreach ($aInterfaces as $oInterface) {
 					$sMac = $oInterface['mac'];
-					Utils::Log(LOG_DEBUG, 'Reading interface information related to MAC @: '.$sMac);
+					Utils::Log(LOG_DEBUG, 'Reading interface information related to MAC @: ' . $sMac);
 					$aLogicalInterfaces[] = array(
 						'macaddress' => $sMac,
 						'name' => $oInterface['network'],
@@ -56,11 +53,9 @@ class vSphereLogicalInterfaceCollector extends Collector
 			// Change array with correct ip_lists
 			$aFinalLogicalInterfaces = array();
 			$aLnkLogicalInterfaceToIPAddress = array();
-			foreach($aLogicalInterfaces as $sLogicalInterface => $aValue)
-			{
+			foreach ($aLogicalInterfaces as $sLogicalInterface => $aValue) {
 				$sKey = array_search($aValue['macaddress'], array_column($aFinalLogicalInterfaces, 'macaddress'));
-				if ($sKey === false)
-				{
+				if ($sKey === false) {
 					$aFinalLogicalInterfaces[] = array(
 						'macaddress' => $aValue['macaddress'],
 						'name' => $aValue['name'],
@@ -69,7 +64,7 @@ class vSphereLogicalInterfaceCollector extends Collector
 					);
 				}
 
-				$aLnkLogicalInterfaceToIPAddress[] = array (
+				$aLnkLogicalInterfaceToIPAddress[] = array(
 					'ipinterface_id' => $aValue['macaddress'],
 					'ipaddress_id' => $aValue['ip']
 				);
@@ -83,8 +78,7 @@ class vSphereLogicalInterfaceCollector extends Collector
 
 	static public function GetLnks()
 	{
-		if (self::$aLnkLogicalInterfaceToIPAddress === null)
-		{
+		if (self::$aLnkLogicalInterfaceToIPAddress === null) {
 			self::GetLogicalInterfaces();
 		}
 		return self::$aLnkLogicalInterfaceToIPAddress;
@@ -117,8 +111,7 @@ class vSphereLogicalInterfaceCollector extends Collector
 
 	public function Fetch()
 	{
-		if ($this->idx < count(self::$aLogicalInterfaces))
-		{
+		if ($this->idx < count(self::$aLogicalInterfaces)) {
 			$aLogicalInterfaces = self::$aLogicalInterfaces[$this->idx++];
 			return array(
 				'primary_key' => $aLogicalInterfaces['macaddress'],

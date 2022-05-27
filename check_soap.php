@@ -1,7 +1,7 @@
 <?php
 // Copyright (C) 2014-2016 Combodo SARL
 //
-//   This application is free software; you can redistribute it and/or modify	
+//   This application is free software; you can redistribute it and/or modify
 //   it under the terms of the GNU Affero General Public License as published by
 //   the Free Software Foundation, either version 3 of the License, or
 //   (at your option) any later version.
@@ -15,10 +15,10 @@
 //   along with this application. If not, see <http://www.gnu.org/licenses/>
 /**
  * check_soap.php: stand-alone command line utility to test the SOAP connectivity to the vSphere server
- * 
+ *
  * Usage: fill the 'vsphere_uri' variable in the configuration file (conf/params.local.xml), then launch (from the command line):
  * php check_soap.php
- * 
+ *
  */
 
 
@@ -40,19 +40,15 @@ function DoPostRequest($sUrl, $sData, $sOptionnalHeaders = null, &$aResponseHead
 {
 	// $sOptionnalHeaders is a string containing additional HTTP headers that you would like to send in your request.
 	$response = '';
-	if (function_exists('curl_init'))
-	{
+	if (function_exists('curl_init')) {
 		// If cURL is available, let's use it, since it provides a greater control over the various HTTP/SSL options
 		// For instance fopen does not allow to work around the bug: http://stackoverflow.com/questions/18191672/php-curl-ssl-routinesssl23-get-server-helloreason1112
 		// by setting the SSLVERSION to 3 as done below.
 		$aHTTPHeaders = array();
-		if ($sOptionnalHeaders !== null)
-		{
+		if ($sOptionnalHeaders !== null) {
 			$aHeaders = explode("\n", $sOptionnalHeaders);
-			foreach($aHeaders as $sHeaderString)
-			{
-				if(preg_match('/^([^:]): (.+)$/', $sHeaderString, $aMatches))
-				{
+			foreach ($aHeaders as $sHeaderString) {
+				if (preg_match('/^([^:]): (.+)$/', $sHeaderString, $aMatches)) {
 					$aHTTPHeaders[$aMatches[1]] = $aMatches[2];
 				}
 			}
@@ -82,34 +78,29 @@ function DoPostRequest($sUrl, $sData, $sOptionnalHeaders = null, &$aResponseHead
 		curl_setopt_array($ch, $aAllOptions);
 		$response = curl_exec($ch);
 		$iErr = curl_errno($ch);
-		$sErrMsg = curl_error( $ch );
-		$aHeaders = curl_getinfo( $ch );
-		if ($iErr !== 0)
-		{
+		$sErrMsg = curl_error($ch);
+		$aHeaders = curl_getinfo($ch);
+		if ($iErr !== 0) {
 			throw new Exception("Problem opening URL: $sUrl, $sErrMsg");
 		}
-		if (is_array($aResponseHeaders))
-		{
+		if (is_array($aResponseHeaders)) {
 			$aHeaders = curl_getinfo($ch);
-			foreach($aHeaders as $sCode => $sValue)
-			{
-				$sName = str_replace(' ' , '-', ucwords(str_replace('_', ' ', $sCode))); // Transform "content_type" into "Content-Type"
+			foreach ($aHeaders as $sCode => $sValue) {
+				$sName = str_replace(' ', '-', ucwords(str_replace('_', ' ', $sCode))); // Transform "content_type" into "Content-Type"
 				$aResponseHeaders[$sName] = $sValue;
 			}
 		}
-		curl_close( $ch );
-	}
-	else
-	{
+		curl_close($ch);
+	} else {
 		echo "Sorry curl is required to run this tool.\n";
 	}
 	return $response;
 }
-	
-define('APPROOT', dirname(dirname(__FILE__)).'/');
 
-require_once(APPROOT.'core/parameters.class.inc.php');
-require_once(APPROOT.'core/utils.class.inc.php');
+define('APPROOT', dirname(dirname(__FILE__)) . '/');
+
+require_once(APPROOT . 'core/parameters.class.inc.php');
+require_once(APPROOT . 'core/utils.class.inc.php');
 
 $aConfig = Utils::GetConfigFiles();
 $sVSphereServerUrl = Utils::GetConfigurationValue('vsphere_uri', '');
@@ -119,16 +110,12 @@ echo "Connecting to https://$sVSphereServerUrl/sdk\n";
 $sData = <<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns1="urn:vim25"><SOAP-ENV:Body><ns1:RetrieveServiceContent><ns1:_this type="ServiceInstance">ServiceInstance</ns1:_this></ns1:RetrieveServiceContent></SOAP-ENV:Body></SOAP-ENV:Envelope>
-EOF
-;
-$sResult = DoPostRequest('https://'.$sVSphereServerUrl.'/sdk', $sData, 'SOAPAction: "urn:vim25/5.0"');
+EOF;
+$sResult = DoPostRequest('https://' . $sVSphereServerUrl . '/sdk', $sData, 'SOAPAction: "urn:vim25/5.0"');
 
-if (preg_match('|^<\\?xml version="1.0" encoding="UTF-8"\\?>\n<soapenv:Envelope.+</soapenv:Envelope>$|s', $sResult))
-{
+if (preg_match('|^<\\?xml version="1.0" encoding="UTF-8"\\?>\n<soapenv:Envelope.+</soapenv:Envelope>$|s', $sResult)) {
 	echo "\nOk, the response looks like a valid SOAP response.\n\n";
-}
-else
-{
+} else {
 	echo "\nERROR, the response DOES NOT look like a valid SOAP response. See details below !!\n\n";
 }
 

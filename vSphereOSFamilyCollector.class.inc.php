@@ -1,7 +1,7 @@
 <?php
 // Copyright (C) 2014-2015 Combodo SARL
 //
-//   This application is free software; you can redistribute it and/or modify	
+//   This application is free software; you can redistribute it and/or modify
 //   it under the terms of the GNU Affero General Public License as published by
 //   the Free Software Foundation, either version 3 of the License, or
 //   (at your option) any later version.
@@ -20,32 +20,26 @@ class vSphereOSFamilyCollector extends Collector
 	protected $aOSFamily;
 	protected static $bUseTeemIp = false;
 
-	
+
 	public function Prepare()
 	{
 		$bRet = parent::Prepare();
 		$this->idx = 0;
 		// Get the different OS Family values from the Virtual Machines
-		if (self::$bUseTeemIp)
-		{
+		if (self::$bUseTeemIp) {
 			$aVMInfos = vSphereVirtualMachineTeemIpCollector::CollectVMInfos();
-		}
-		else
-		{
+		} else {
 			$aVMInfos = vSphereVirtualMachineCollector::CollectVMInfos();
 		}
 		$aTmp = array();
-		foreach($aVMInfos as $aVM)
-		{
-			if (array_key_exists('osfamily_id', $aVM) && ($aVM['osfamily_id'] != null))
-			{
+		foreach ($aVMInfos as $aVM) {
+			if (array_key_exists('osfamily_id', $aVM) && ($aVM['osfamily_id'] != null)) {
 				$aTmp[$aVM['osfamily_id']] = true;
 			}
 		}
 		// Add the different OS Family values from the Hypervisors
 		$aHypervisors = vSphereHypervisorCollector::GetHypervisors();
-		foreach($aHypervisors as $aHV)
-		{
+		foreach ($aHypervisors as $aHV) {
 			$aTmp[$aHV['osfamily_id']] = true;
 		}
 		$this->aOSFamily = array_keys($aTmp);
@@ -59,8 +53,7 @@ class vSphereOSFamilyCollector extends Collector
 
 	public function Fetch()
 	{
-		if ($this->idx < count($this->aOSFamily))
-		{
+		if ($this->idx < count($this->aOSFamily)) {
 			$sOSFamily = $this->aOSFamily[$this->idx++];
 			return array('primary_key' => $sOSFamily, 'name' => $sOSFamily);
 		}

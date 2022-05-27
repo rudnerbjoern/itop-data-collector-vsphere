@@ -1,7 +1,7 @@
 <?php
 // Copyright (C) 2014-2018 Combodo SARL
 //
-//   This application is free software; you can redistribute it and/or modify	
+//   This application is free software; you can redistribute it and/or modify
 //   it under the terms of the GNU Affero General Public License as published by
 //   the Free Software Foundation, either version 3 of the License, or
 //   (at your option) any later version.
@@ -22,8 +22,7 @@ class vSphereVirtualMachineTeemIpCollector extends vSphereVirtualMachineCollecto
 	{
 		$aResult = parent::DoCollectVMInfo($aFarms, $oVirtualMachine, $aVLANs, $idx);
 
-		if ($aResult !== null)
-		{
+		if ($aResult !== null) {
 			$aTeemIpOptions = Utils::GetConfigurationValue('teemip_options', array());
 			$bCollectIps = ($aTeemIpOptions['collect_ips'] == 'yes') ? true : false;
 			$bCollectIPv6Addresses = ($aTeemIpOptions['manage_ipv6'] == 'yes') ? true : false;
@@ -35,21 +34,17 @@ class vSphereVirtualMachineTeemIpCollector extends vSphereVirtualMachineCollecto
 			// Trim IP address if necessary
 			$sGuestIP = $oVirtualMachine->guest->ipAddress;
 			// Trim IP address if necessary
-			if (!$bCollectIps)
-			{
+			if (!$bCollectIps) {
 				$sGuestIP = '';
-			}
-			else
-			{
-				if (!$bCollectIPv6Addresses)
-				{
+			} else {
+				if (!$bCollectIPv6Addresses) {
 					$sGuestIP = (strpos($sGuestIP, ':') !== false) ? '' : $sGuestIP;
 				}
 			}
 
 			//unset($aResult['managementip']);
 			$aResult['managementip_id'] = $sGuestIP;
-			utils::Log(LOG_DEBUG, "Setting managementip_id: ".$sGuestIP);
+			utils::Log(LOG_DEBUG, "Setting managementip_id: " . $sGuestIP);
 			$aResult['short_name'] = $sGuestShortName;
 		}
 		return $aResult;
@@ -58,38 +53,28 @@ class vSphereVirtualMachineTeemIpCollector extends vSphereVirtualMachineCollecto
 	static protected function DoCollectVMIPs($aMACToNetwork, $oVirtualMachine)
 	{
 		$aTeemIpOptions = Utils::GetConfigurationValue('teemip_options', array());
-		$bCollectIPv6Addresses = ($aTeemIpOptions['manage_ipv6'] == 'yes') ? true :false;
+		$bCollectIPv6Addresses = ($aTeemIpOptions['manage_ipv6'] == 'yes') ? true : false;
 
 		$aNWInterfaces = array();
-		foreach($oVirtualMachine->guest->net as $oNICInfo)
-		{
-			if ($oNICInfo->ipConfig && $oNICInfo->ipConfig->ipAddress)
-			{
-				foreach($oNICInfo->ipConfig->ipAddress as $oIPInfo)
-				{
+		foreach ($oVirtualMachine->guest->net as $oNICInfo) {
+			if ($oNICInfo->ipConfig && $oNICInfo->ipConfig->ipAddress) {
+				foreach ($oNICInfo->ipConfig->ipAddress as $oIPInfo) {
 					Utils::Log(LOG_DEBUG, "Reading VM's IP and MAC address");
-					if (strpos($oIPInfo->ipAddress, ':') !== false)
-					{
+					if (strpos($oIPInfo->ipAddress, ':') !== false) {
 						// It's an IPv6 address
-						if ($bCollectIPv6Addresses)
-						{
+						if ($bCollectIPv6Addresses) {
 							$aNWInterfaces[] = array(
 								'ip' => $oIPInfo->ipAddress,
 								'mac' => $oNICInfo->macAddress,
 								'network' => array_key_exists($oNICInfo->macAddress, $aMACToNetwork) ? $aMACToNetwork[$oNICInfo->macAddress] : '',
 								'subnet_mask' => (int)$oIPInfo->prefixLength,
 							);
-						}
-						else
-						{
+						} else {
 							Utils::Log(LOG_DEBUG, "Ignoring an IP v6 address");
 						}
-					}
-					else
-					{
+					} else {
 						// If we have a guest IP set to IPv6, replace it with the first IPv4 we find
-						if(strpos($oVirtualMachine->guest->ipAddress, ":") !== false)
-						{
+						if (strpos($oVirtualMachine->guest->ipAddress, ":") !== false) {
 							$oVirtualMachine->guest->ipAddress = $oIPInfo->ipAddress;
 						}
 

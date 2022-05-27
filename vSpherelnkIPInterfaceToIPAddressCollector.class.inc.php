@@ -26,8 +26,7 @@ class vSpherelnkIPInterfaceToIPAddressCollector extends Collector
 
 	static public function GetLnks()
 	{
-		if (self::$aLnks === null)
-		{
+		if (self::$aLnks === null) {
 			self::$aLnks = vSphereLogicalInterfaceCollector::GetLnks();
 		}
 		return self::$aLnks;
@@ -47,16 +46,14 @@ class vSpherelnkIPInterfaceToIPAddressCollector extends Collector
 
 	public function Fetch()
 	{
-		if ($this->idx < count(self::$aLnks))
-		{
+		if ($this->idx < count(self::$aLnks)) {
 			$aLnks = self::$aLnks[$this->idx++];
 			return array(
-				'primary_key' => $aLnks['ipinterface_id'].'-'.$aLnks['ipaddress_id'],
+				'primary_key' => $aLnks['ipinterface_id'] . '-' . $aLnks['ipaddress_id'],
 				'ipinterface_id' => $aLnks['ipinterface_id'],
 				'ipaddress_id' => $aLnks['ipaddress_id']
 			);
 		}
 		return false;
 	}
-
 }

@@ -1,7 +1,7 @@
 <?php
 // Copyright (C) 2014-2015 Combodo SARL
 //
-//   This application is free software; you can redistribute it and/or modify	
+//   This application is free software; you can redistribute it and/or modify
 //   it under the terms of the GNU Affero General Public License as published by
 //   the Free Software Foundation, either version 3 of the License, or
 //   (at your option) any later version.
@@ -14,11 +14,11 @@
 //   You should have received a copy of the GNU Affero General Public License
 //   along with this application. If not, see <http://www.gnu.org/licenses/>
 
-class vSphereFarmCollector extends Collector
+class vSphereFarmCollector extends ConfigurableCollector
 {
 	protected $idx;
 	static protected $aFarms = null;
-	
+
 	public function AttributeIsOptional($sAttCode)
 	{
 		// If the module Service Management for Service Providers is selected during the setup
@@ -31,45 +31,40 @@ class vSphereFarmCollector extends Collector
 
 		return parent::AttributeIsOptional($sAttCode);
 	}
-	
+
 	static public function GetFarms()
 	{
-		if (self::$aFarms === null)
-		{
+		if (self::$aFarms === null) {
 			$sVSphereServer = Utils::GetConfigurationValue('vsphere_uri', '');
 			$sLogin = Utils::GetConfigurationValue('vsphere_login', '');
 			$sPassword = Utils::GetConfigurationValue('vsphere_password', '');
 			$sDefaultOrg = Utils::GetConfigurationValue('default_org_id');
-	
+
 			$vhost = new \Vmwarephp\Vhost($sVSphereServer, $sLogin, $sPassword);
-	
+
 			$aFarms = $vhost->findAllManagedObjects('ClusterComputeResource', array('configurationEx'));
 			self::$aFarms = array();
-			
-			foreach($aFarms as $oFarm)
-			{
-				Utils::Log(LOG_DEBUG, 'Farm->name: '.$oFarm->name);
+
+			foreach ($aFarms as $oFarm) {
+				Utils::Log(LOG_DEBUG, 'Farm->name: ' . $oFarm->name);
 				$aHosts = array();
-				foreach($oFarm->host as $oHost)
-				{
-					if (is_object($oHost))
-					{
+				foreach ($oFarm->host as $oHost) {
+					if (is_object($oHost)) {
 						$aHosts[] = $oHost->name;
 					}
 				}
-				
+
 				self::$aFarms[] = array(
 					'id' => $oFarm->name,
 					'name' => $oFarm->name,
 					'org_id' => $sDefaultOrg,
 					'hosts' => $aHosts,
 				);
-
-			}			
+			}
 		}
 		return self::$aFarms;
 	}
-	
+
 	public function Prepare()
 	{
 		$bRet = parent::Prepare();
@@ -83,13 +78,12 @@ class vSphereFarmCollector extends Collector
 
 	public function Fetch()
 	{
-		if ($this->idx < count(self::$aFarms))
-		{
+		if ($this->idx < count(self::$aFarms)) {
 			$aFarm = self::$aFarms[$this->idx++];
 			return array(
-					'primary_key' => $aFarm['id'],
-					'name' => $aFarm['name'],
-					'org_id' => $aFarm['org_id'],
+				'primary_key' => $aFarm['id'],
+				'name' => $aFarm['name'],
+				'org_id' => $aFarm['org_id'],
 			);
 		}
 		return false;

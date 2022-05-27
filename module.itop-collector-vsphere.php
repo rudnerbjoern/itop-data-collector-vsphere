@@ -25,18 +25,14 @@ SetupWebPage::AddModule(
 
 		// Setup
 		//
-		'dependencies' => array(
-		),
+		'dependencies' => array(),
 		'mandatory' => false,
 		'visible' => true,
 
 		// Components
 		//
-		'datamodel' => array(
-		),
-		'webservice' => array(
-
-		),
+		'datamodel' => array(),
+		'webservice' => array(),
 		'data.struct' => array(
 			// add your 'structure' definition XML files here,
 		),
