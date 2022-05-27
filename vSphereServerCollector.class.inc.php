@@ -29,6 +29,8 @@ class vSphereServerCollector extends ConfigurableCollector
 		// on Servers. Let's safely ignore it.
 		if ($sAttCode == 'providercontracts_list') return true;
 
+		if ($sAttCode == 'system_landscape') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 

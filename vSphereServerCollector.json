@@ -173,6 +173,14 @@
 			"friendlyname": "nb_u"
 		},
 		{
+			"attcode": "position_v",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "write_if_empty",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "position_v"
+		},
+		{
 			"attcode": "networkdevice_list",
 			"update": "0",
 			"reconcile": "0",
@@ -311,9 +319,17 @@
 			"attcode": "status",
 			"update": "1",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"finalclass": "SynchroAttribute",
 			"friendlyname": "status"
+		},
+		{
+			"attcode": "system_landscape",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "write_if_empty",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "system_landscape"
 		},
 		{
 			"attcode": "tickets_list",
