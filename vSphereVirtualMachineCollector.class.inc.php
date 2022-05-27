@@ -439,7 +439,7 @@ class vSphereVirtualMachineCollector extends ConfigurableCollector
 	{
 		$aDS = array();
 		foreach ($aVM['datastores'] as $aDSDatas) {
-			$aDS[] =	'virtual_volume_name:' . $aDSDatas['name'] . ';volume_id->lun_id:' . $aDSDatas['lun_id'] . ';size_used:' . $aDSDatas['size_used'];
+			$aDS[] =	'volume_name:' . $aDSDatas['name'] . ';volume_id->lun_id:' . $aDSDatas['lun_id'] . ';size_used:' . $aDSDatas['size_used'];
 		}
 		return array(
 			'primary_key' => $aVM['id'],
