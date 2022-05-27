@@ -20,7 +20,7 @@
 			"attcode": "aliases",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"finalclass": "SynchroAttribute",
 			"friendlyname": "aliases"
 		},
@@ -28,7 +28,7 @@
 			"attcode": "allocation_date",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"finalclass": "SynchroAttribute",
 			"friendlyname": "allocation_date"
 		},
@@ -36,7 +36,7 @@
 			"attcode": "comment",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"finalclass": "SynchroAttribute",
 			"friendlyname": "comment"
 		},
@@ -44,7 +44,7 @@
 			"attcode": "contact_list",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"row_separator": "|",
 			"attribute_separator": ";",
 			"value_separator": ":",
@@ -56,7 +56,7 @@
 			"attcode": "document_list",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"row_separator": "|",
 			"attribute_separator": ";",
 			"value_separator": ":",
@@ -68,7 +68,7 @@
 			"attcode": "domain_id",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey",
 			"friendlyname": "domain_id"
@@ -77,7 +77,7 @@
 			"attcode": "fqdn",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"finalclass": "SynchroAttribute",
 			"friendlyname": "fqdn"
 		},
@@ -93,7 +93,7 @@
 			"attcode": "ip_list",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"row_separator": "|",
 			"attribute_separator": ";",
 			"value_separator": ":",
@@ -114,7 +114,7 @@
 			"attcode": "range_id",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey",
 			"friendlyname": "range_id"
@@ -123,7 +123,7 @@
 			"attcode": "release_date",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"finalclass": "SynchroAttribute",
 			"friendlyname": "release_date"
 		},
@@ -131,7 +131,7 @@
 			"attcode": "requestor_id",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey",
 			"friendlyname": "requestor_id"
@@ -156,7 +156,7 @@
 			"attcode": "subnet_id",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey",
 			"friendlyname": "subnet_id"
@@ -165,7 +165,7 @@
 			"attcode": "usage_id",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey",
 			"friendlyname": "usage_id"
