@@ -1,7 +1,7 @@
 <?php
 // Copyright (C) 2014-2015 Combodo SARL
 //
-//   This application is free software; you can redistribute it and/or modify	
+//   This application is free software; you can redistribute it and/or modify
 //   it under the terms of the GNU Affero General Public License as published by
 //   the Free Software Foundation, either version 3 of the License, or
 //   (at your option) any later version.
@@ -23,18 +23,16 @@ class vSphereServerTeemIpCollector extends vSphereServerCollector
 		$aResult = parent::DoCollectServer($aHyperV);
 
 		$aTeemIpOptions = Utils::GetConfigurationValue('teemip_options', array());
-		$bCollectIps = ($aTeemIpOptions['collect_ips'] == 'yes') ? true :false;
-		$bCollectIPv6Addresses = ($aTeemIpOptions['manage_ipv6'] == 'yes') ? true :false;
+		$bCollectIps = ($aTeemIpOptions['collect_ips'] == 'yes') ? true : false;
+		$bCollectIPv6Addresses = ($aTeemIpOptions['manage_ipv6'] == 'yes') ? true : false;
 
-		$sName = $aHyperV['name'];
+		$sName = $aHyperV['managementip'];
 		$sIP = '';
-		if ($bCollectIps == 'yes')
-		{
+		if ($bCollectIps == 'yes') {
 			// Check if name has IPv4 or "IPv6" format
 			$sNum = '(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])';
 			$sPattern = "($sNum\.$sNum\.$sNum\.$sNum)";
-			if (preg_match($sPattern, $sName) || (($bCollectIPv6Addresses == 'yes') && (strpos($sName, ":") !== false)))
-			{
+			if (preg_match($sPattern, $sName) || (($bCollectIPv6Addresses == 'yes') && (strpos($sName, ":") !== false))) {
 				$sIP = $sName;
 			}
 		}
@@ -69,5 +67,4 @@ class vSphereServerTeemIpCollector extends vSphereServerCollector
 
 		$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'managementip_id'), 'managementip_id', $iLineIndex);
 	}
-
 }

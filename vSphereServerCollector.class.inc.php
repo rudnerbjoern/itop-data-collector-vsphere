@@ -1,7 +1,7 @@
 <?php
 // Copyright (C) 2014-2020 Combodo SARL
 //
-//   This application is free software; you can redistribute it and/or modify	
+//   This application is free software; you can redistribute it and/or modify
 //   it under the terms of the GNU Affero General Public License as published by
 //   the Free Software Foundation, either version 3 of the License, or
 //   (at your option) any later version.
@@ -18,7 +18,7 @@ class vSphereServerCollector extends ConfigurableCollector
 {
 	protected $idx;
 	protected static $aServers;
-	
+
 	public function AttributeIsOptional($sAttCode)
 	{
 		// If the module Service Management for Service Providers is selected during the setup
@@ -34,11 +34,9 @@ class vSphereServerCollector extends ConfigurableCollector
 
 	public static function CollectServerInfos()
 	{
-		if (static::$aServers === null)
-		{
+		if (static::$aServers === null) {
 			$aHypervisors = vSphereHypervisorCollector::GetHypervisors();
-			foreach($aHypervisors as $aHyperV)
-			{
+			foreach ($aHypervisors as $aHyperV) {
 				static::$aServers[] = static::DoCollectServer($aHyperV);
 			}
 		}
@@ -60,12 +58,12 @@ class vSphereServerCollector extends ConfigurableCollector
 			'osversion_id' => $aHyperV['osversion_id'],
 			'cpu' => $aHyperV['cpu'],
 			'ram' => $aHyperV['ram'],
+			'managementip' => $aHyperV['managementip'],
 		);
-		
+
 		// Add the custom fields (if any)
-		foreach(vSphereHypervisorCollector::GetCustomFields(__CLASS__) as $sAttCode => $sFieldDefinition)
-		{
-		    $aData[$sAttCode] = $aHyperV['server-custom-'.$sAttCode];
+		foreach (vSphereHypervisorCollector::GetCustomFields(__CLASS__) as $sAttCode => $sFieldDefinition) {
+			$aData[$sAttCode] = $aHyperV['server-custom-' . $sAttCode];
 		}
 		return $aData;
 	}
@@ -80,11 +78,10 @@ class vSphereServerCollector extends ConfigurableCollector
 		$this->idx = 0;
 		return true;
 	}
-	
+
 	public function Fetch()
 	{
-		if ($this->idx < count(static::$aServers))
-		{
+		if ($this->idx < count(static::$aServers)) {
 			$aServer = static::$aServers[$this->idx++];
 			return $this->DoFetch($aServer);
 		}
@@ -95,25 +92,25 @@ class vSphereServerCollector extends ConfigurableCollector
 	{
 		return $aServer;
 	}
-	
+
 	protected function MustProcessBeforeSynchro()
 	{
 		// We must reprocess the CSV data obtained from vSphere
 		// to lookup the Brand/Model and OSFamily/OSVersion in iTop
 		return true;
 	}
-	
+
 	protected function InitProcessBeforeSynchro()
 	{
 		// Retrieve the identifiers of the OSVersion since we must do a lookup based on two fields: Family + Version
 		// which is not supported by the iTop Data Synchro... so let's do the job of an ETL
-		$this->oOSVersionLookup = new LookupTable('SELECT OSVersion', array('osfamily_id_friendlyname', 'name'));		
+		$this->oOSVersionLookup = new LookupTable('SELECT OSVersion', array('osfamily_id_friendlyname', 'name'));
 
 		// Retrieve the identifiers of the Model since we must do a lookup based on two fields: Brand + Model
 		// which is not supported by the iTop Data Synchro... so let's do the job of an ETL
-		$this->oModelLookup = new LookupTable('SELECT Model', array('brand_id_friendlyname', 'name'));		
+		$this->oModelLookup = new LookupTable('SELECT Model', array('brand_id_friendlyname', 'name'));
 	}
-	
+
 	protected function ProcessLineBeforeSynchro(&$aLineData, $iLineIndex)
 	{
 		// Process each line of the CSV

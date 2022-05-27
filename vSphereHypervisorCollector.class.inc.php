@@ -77,6 +77,8 @@ class vSphereHypervisorCollector extends ConfigurableCollector
 
 				// DEBUG
 				utils::Log(LOG_DEBUG, "Hypervisor: {$oHypervisor->name}, config:\n" . myprint_r($oHypervisor));
+				utils::Log(LOG_DEBUG, "Hypervisor: {$oHypervisor->name}, hardware config:\n" . myprint_r($oHypervisor->hardware));
+				utils::Log(LOG_DEBUG, "Hypervisor: {$oHypervisor->name}, summary config:\n" . myprint_r($oHypervisor->summary));
 				// DEBUG
 
 				$sFarmName = '';
@@ -106,6 +108,7 @@ class vSphereHypervisorCollector extends ConfigurableCollector
 					'status' => 'production',
 					'farm_id' => $sFarmName,
 					'server_id' => $oHypervisor->name,
+					'managementip' => $oHypervisor->summary->managementServerIp,
 				);
 
 				foreach (static::GetCustomFields(__CLASS__) as $sAttCode => $sFieldDefinition) {
