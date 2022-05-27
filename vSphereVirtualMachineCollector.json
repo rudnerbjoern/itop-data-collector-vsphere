@@ -208,9 +208,122 @@
 			"reconciliation_attcode": "name",
 			"finalclass": "SynchroAttExtKey",
 			"friendlyname": "virtualhost_id"
+		},
+		{
+			"attcode": "S_UUID",
+			"update": "1",
+			"reconcile": "1",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_UUID"
+		},
+		{
+			"attcode": "S_CREATOR",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_CREATOR"
+		},
+		{
+			"attcode": "S_FUNCTION",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_FUNCTION"
+		},
+		{
+			"attcode": "S_Contact_1",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_Contact_1"
+		},
+		{
+			"attcode": "S_Contact_2",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_Contact_2"
+		},
+		{
+			"attcode": "S_Comment",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_Comment"
+		},
+		{
+			"attcode": "S_Usage",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_Usage"
+		},
+		{
+			"attcode": "S_Project",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_Project"
+		},
+		{
+			"attcode": "S_Backup",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_Backup"
+		},
+		{
+			"attcode": "S_Template",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_Template"
+		},
+		{
+			"attcode": "power_status",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "power_status"
+		},
+		{
+			"attcode": "vcenter",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "vcenter"
+		},
+		{
+			"attcode": "S_EndOfLife",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"finalclass": "SynchroAttribute",
+			"friendlyname": "S_EndOfLife"
+		},
+		{
+			"attcode": "location_id",
+			"update": "1",
+			"reconcile": "0",
+			"update_policy": "master_locked",
+			"reconciliation_attcode": "name",
+			"finalclass": "SynchroAttExtKey",
+			"friendlyname": "location_id"
 		}
 	],
-	"user_delete_policy": "$user_delete_policy$",
+	"user_delete_policy": "nobody",
 	"url_icon": "",
 	"url_application": ""
 }

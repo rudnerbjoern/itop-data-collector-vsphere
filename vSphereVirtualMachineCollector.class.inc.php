@@ -26,7 +26,8 @@ function myprint_r($var)
 	}
 	return $s;
 }
-class vSphereVirtualMachineCollector extends Collector
+//class vSphereVirtualMachineCollector extends Collector
+class vSphereVirtualMachineCollector extends ConfigurableCollector
 {
 	protected $idx;
 	/**
@@ -107,12 +108,19 @@ class vSphereVirtualMachineCollector extends Collector
 				}
 			}
 
+			// get all datastores of the host to create a name to ids map
+			$aDatastores      = $vhost->findAllManagedObjects('Datastore', 'all');
+			$aDatastoresNaa   = array();
+			foreach ($aDatastores as $DS) {
+				$aDatastoreNaa[$DS->name] = $DS->info->vmfs->extent[0]->diskName;
+			}
+
 			$aVirtualMachines = $vhost->findAllManagedObjects('VirtualMachine', array('config', 'runtime', 'guest', 'network', 'storage'));
 
 			$idx = 1;
 			foreach ($aVirtualMachines as $oVirtualMachine) {
 				utils::Log(LOG_DEBUG, ">>>>>> Starting collection of the VM '" . $oVirtualMachine->name . "' (VM #$idx)");
-				$aVM = static::DoCollectVMInfo($aFarms, $oVirtualMachine, $aVLANs, $idx);
+				$aVM = static::DoCollectVMInfo($aFarms, $oVirtualMachine, $aVLANs, $idx, $aDatastoreNaa);
 				if ($aVM !== null) {
 					static::$aVMInfos[] = $aVM;
 				}
@@ -124,7 +132,7 @@ class vSphereVirtualMachineCollector extends Collector
 		return static::$aVMInfos;
 	}
 
-	static protected function DoCollectVMInfo($aFarms, $oVirtualMachine, $aVLANs, $idx)
+	static protected function DoCollectVMInfo($aFarms, $oVirtualMachine, $aVLANs, $idx, $aDatastoreNaa)
 	{
 		utils::Log(LOG_DEBUG, "Runtime->connectionState: " . $oVirtualMachine->runtime->connectionState);
 		utils::Log(LOG_DEBUG, "Runtime->powerState: " . $oVirtualMachine->runtime->powerState);
@@ -185,6 +193,33 @@ class vSphereVirtualMachineCollector extends Collector
 			$aNWInterfaces = static::DoCollectVMIPs($aMACToNetwork, $oVirtualMachine);
 		}
 
+		//Datastore Usage, v2
+		$aDSUsage   = array();
+		$aVmDSUsage = array();
+		utils::Log(LOG_DEBUG, "Collecting datastores usage for this VM...");
+		foreach ($oVirtualMachine->config->hardware->device as $oVMdev) {
+			if (get_class($oVMdev) == 'VirtualDisk') {
+				// print "        ".get_class($dev)." - ".$dev->capacityInKB." - ".$dev->backing->fileName."\n";
+				$sVMds = $oVMdev->backing->fileName;
+				$sVMds = substr($sVMds, 1, strpos($sVMds, "]") - 1);
+				$aVmDSUsage[$sVMds] += $oVMdev->capacityInKB;
+			}
+		}
+
+		utils::Log(LOG_DEBUG, "Compiling datastore usage...");
+		foreach ($aVmDSUsage as $ds => $size) {
+			$lunid = "undefined";
+			if ($aDatastoreNaa[$ds]) {
+				$lunid = $aDatastoreNaa[$ds];
+			}
+			$sizeG = str_replace('.', ',', sprintf("%.2F", $size / (1024 * 1024)));
+			$aDSUsage[] = array(
+				'name'      => $ds,
+				'lun_id'    => $lunid,
+				'size_used' => $sizeG,
+			);
+		}
+
 		$aDisks = array();
 		utils::Log(LOG_DEBUG, "Collecting disk info...");
 		if ($oVirtualMachine->guest->disk) {
@@ -206,6 +241,20 @@ class vSphereVirtualMachineCollector extends Collector
 				$sFarmName = $aFarm['name'];
 				break; // Farm found
 			}
+		}
+
+		// first attempt to collect Custom Attributes
+		// goal : cAttrs contains the name of the Custon Attribute as key, and the value as value
+		// to minimize risk of bad interaction the CA Name is prefixed by CA-
+		$aAttrs = array();
+		Utils::Log(LOG_DEBUG, "Collecting Custom Attributes for this VM...");
+		$aAttrLabels = array();
+		$oAttrDefs = $oVirtualMachine->availableField;
+		foreach ($oAttrDefs as $oAttrDef) {
+			$aAttrLabels[$oAttrDef->key] = $oAttrDef->name;
+		}
+		foreach ($oVirtualMachine->customValue as $oAttrValue) {
+			$aAttrs['CA-' . $aAttrLabels[$oAttrValue->key]] = $oAttrValue->value;
 		}
 
 		utils::Log(LOG_DEBUG, "Building VM record...");
@@ -234,7 +283,42 @@ class vSphereVirtualMachineCollector extends Collector
 		$sHostName = $oVirtualMachine->runtime->host->name;
 		utils::Log(LOG_DEBUG, "    Host name: $sHostName");
 
-		return array(
+		utils::Log(LOG_DEBUG, "Reading UUID...");
+		$sVmUuid = $oVirtualMachine->config->uuid;
+		utils::Log(LOG_DEBUG, "    UUID: $sVmUuid");
+
+		utils::Log(LOG_DEBUG, "Reading powerState...");
+		$sPowerState = $oVirtualMachine->runtime->powerState;
+		utils::Log(LOG_DEBUG, "    powerState: $sPowerState");
+
+		utils::Log(LOG_DEBUG, "Reading vCenter...");
+		$sVcenter = "https://" . Utils::GetConfigurationValue('vsphere_uri', '') . "/ui/?locale=en_US";
+		utils::Log(LOG_DEBUG, "    vCenter: $sVcenter");
+
+		utils::Log(LOG_DEBUG, "Reading custom attributes...");
+		foreach ($aAttrs as $sAttrk => $sAttrv) {
+			utils::Log(LOG_DEBUG, "    $sAttrk = $sAttrv");
+		}
+		utils::Log(LOG_DEBUG, "Reading datastores...");
+		foreach ($aDSUsage as $s_dd) {
+			$s_out = '';
+			foreach ($s_dd as $s_ddk => $s_ddd) {
+				$s_out .= "$s_ddk:'$s_ddd'|";
+			}
+			$s_out = substr($s_out, 0, -1);
+			utils::Log(LOG_DEBUG, "   $s_out");
+		}
+		utils::Log(LOG_DEBUG, "Reading Disks...");
+		foreach ($aDisks as $s_disk) {
+			$s_out = '';
+			foreach ($s_disk as $s_dkey => $s_ddata) {
+				$s_out .= "$s_dkey:'$s_ddata'|";
+			}
+			$s_out = substr($s_out, 0, -1);
+			utils::Log(LOG_DEBUG, $s_out);
+		}
+
+		return array_merge(array(
 			'id' => $oVirtualMachine->getReferenceId(),
 			'name' => $sName,
 			'org_id' => $sDefaultOrg,
@@ -245,11 +329,15 @@ class vSphereVirtualMachineCollector extends Collector
 			'ram' => $iMemory,
 			'osfamily_id' => $OSFamily,
 			'osversion_id' => $OSVersion,
+			'datastores' => $aDSUsage,
 			'disks' => $aDisks,
 			'interfaces' => $aNWInterfaces,
 			'virtualhost_id' => empty($sFarmName) ? $sHostName : $sFarmName,
 			'description' => $sAnnotation,
-		);
+			'S_UUID' => $sVmUuid,
+			'powerState' => $sPowerState,
+			'vcenter' => $sVcenter,
+		), $aAttrs);
 	}
 
 	static protected function DoCollectVMIPs($aMACToNetwork, $oVirtualMachine)
@@ -296,7 +384,11 @@ class vSphereVirtualMachineCollector extends Collector
 		if (self::$oOSFamilyMappings === null) {
 			self::$oOSFamilyMappings =  new MappingTable('os_family_mapping');
 		}
-		$sRawValue = $oVirtualMachine->config->guestFullName;
+		// better to use the OS according to the VMware Tools, if available
+		$sRawValue = $oVirtualMachine->guest->guestFullName;
+		if ($sRawValue == '') {
+			$sRawValue = $oVirtualMachine->config->guestFullName;
+		}
 		$value = self::$oOSFamilyMappings->MapValue($sRawValue, '');
 
 		return $value;
@@ -313,7 +405,11 @@ class vSphereVirtualMachineCollector extends Collector
 		if (self::$oOSVersionMappings === null) {
 			self::$oOSVersionMappings =  new MappingTable('os_version_mapping');
 		}
-		$sRawValue = $oVirtualMachine->config->guestFullName;
+		// better to use the OS according to the VMware Tools, if available
+		$sRawValue = $oVirtualMachine->guest->guestFullName;
+		if ($sRawValue == '') {
+			$sRawValue = $oVirtualMachine->config->guestFullName;
+		}
 		$value = self::$oOSVersionMappings->MapValue($sRawValue, $sRawValue); // Keep the raw value by default
 
 		return $value;
@@ -330,6 +426,33 @@ class vSphereVirtualMachineCollector extends Collector
 		return true;
 	}
 
+	// date control - maybe available elsewhere ?
+	function s_checkdate($dte_in)
+	{
+		$dte_out = '0000-00-00';
+		if (preg_match('/^2[0-9]{3}-[0-1][0-9]-[0-3][0-9]$/', $dte_in)) {
+			if (checkdate(substr($dte_in, 5, 2), substr($dte_in, 8, 2), substr($dte_in, 0, 4))) {
+				$dte_out = $dte_in;
+			}
+		}
+		return $dte_out;
+	}
+	// specific : set the location based on the S_SITE attribute
+	// RDE or DC2 -> 'zayo zColo'
+	// DC1 -> 'Equinix PA6'
+	// Any other value -> ''
+	function s_set_location($site)
+	{
+		$s_site = '';
+		if ((strtoupper($site) == 'RDE') or (strtoupper($site) == 'DC2')) {
+			$s_site = 'DC2 - zayo zColo';
+		}
+		if (strtoupper($site) == 'DC1') {
+			$s_site = 'DC1 - Equinix PA6';
+		}
+		return $s_site;
+	}
+
 	public function Fetch()
 	{
 		if ($this->idx < count(static::$aVMInfos)) {
@@ -341,6 +464,10 @@ class vSphereVirtualMachineCollector extends Collector
 
 	protected function DoFetch($aVM)
 	{
+		$aDS = array();
+		foreach ($aVM['datastores'] as $aDSDatas) {
+			$aDS[] =	'virtual_volume_name:' . $aDSDatas['name'] . ';volume_id->lun_id:' . $aDSDatas['lun_id'] . ';size_used:' . $aDSDatas['size_used'];
+		}
 		return array(
 			'primary_key' => $aVM['id'],
 			'name' => $aVM['name'],
@@ -349,11 +476,26 @@ class vSphereVirtualMachineCollector extends Collector
 			'ram' => $aVM['ram'],
 			'cpu' => ((int)$aVM['cpu']),
 			'managementip' => $aVM['managementip'],
+			'move2production' => self::s_checkdate($aVM['CA-S_DATECREAT']),
 			'osfamily_id' => $aVM['osfamily_id'],
-			//'logicalvolumes_list' => implode('|', $aDS),
+			'logicalvolumes_list' => implode('|', $aDS),
 			'osversion_id' => $aVM['osversion_id'],
 			'virtualhost_id' => $aVM['virtualhost_id'],
 			'description' => str_replace(array("\n", "\r"), ' ', $aVM['description']),
+			'S_UUID' => strtolower($aVM['S_UUID']),
+			'S_FUNCTION' => $aVM['CA-S_FONCTION'],
+			'S_CREATOR' => $aVM['CA-S_CREATEUR'],
+			'S_Contact_1' => $aVM['CA-S_CONTACT_1'],
+			'S_Contact_2' => $aVM['CA-S_CONTACT_2'],
+			'S_Comment' => $aVM['CA-S_COMMENT'],
+			'S_Usage' => $aVM['CA-S_PLATEFORME'],
+			'S_Project' => $aVM['CA-S_PROJET'],
+			'S_Template' => $aVM['CA-S_TEMPLATE'],
+			'S_Backup' => $aVM['CA-S_SVG_API'] . " / " . $aVM['CA-S_SVG_API_MODE'] . " / " . $aVM['CA-S_SVG_API_TYPE'],
+			'S_EndOfLife' => self::s_checkdate($aVM['CA-S_DATEFINVIE']),
+			'location_id' => self::s_set_location($aVM['CA-S_SITE']),
+			'power_status' => $aVM['powerState'],
+			'vcenter' => $aVM['vcenter'],
 		);
 	}
 

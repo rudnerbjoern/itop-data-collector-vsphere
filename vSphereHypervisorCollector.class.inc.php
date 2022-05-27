@@ -85,8 +85,23 @@ class vSphereHypervisorCollector extends ConfigurableCollector
 					}
 				}
 
+				// get the serial number is not that easy...
+				$sSerialNumber = 'unknown';
+				foreach ($oHypervisor->hardware->systemInfo->otherIdentifyingInfo as $oTstSN) {
+					if ($oTstSN->identifierType->key == 'ServiceTag') {
+						$sSerialNumber = $oTstSN->identifierValue;
+					}
+				}
+
+				// management_ip quest
+				$sManagementIp = '';
+				foreach ($oHypervisor->config->option as $oTstIP) {
+					if ($oTstIP->key == 'Vpx.Vpxa.config.vpxa.hostIp') {
+						$sManagementIp = $oTstIP->value;
+					}
+				}
+
 				Utils::Log(LOG_DEBUG, "Server {$oHypervisor->name}: {$oHypervisor->hardware->systemInfo->vendor} {$oHypervisor->hardware->systemInfo->model}");
-				Utils::Log(LOG_DEBUG, "Server software: {$oHypervisor->config->product->fullName} - API Version: {$oHypervisor->config->product->apiVersion}");
 
 				$aHypervisorData = array(
 					'id' => $oHypervisor->getReferenceId(),
@@ -102,6 +117,8 @@ class vSphereHypervisorCollector extends ConfigurableCollector
 					'status' => 'production',
 					'farm_id' => $sFarmName,
 					'server_id' => $oHypervisor->name,
+					'serialnumber' => $sSerialNumber,
+					'managementip' => $sManagementIp,
 				);
 
 				foreach (static::GetCustomFields(__CLASS__) as $sAttCode => $sFieldDefinition) {
@@ -122,7 +139,7 @@ class vSphereHypervisorCollector extends ConfigurableCollector
 	public static function GetCustomFields($sClass)
 	{
 		$aCustomFields = array();
-		$aCustomSynchro = Utils::GetConfigurationValue('custom_synchro', array());
+		$aCustomSynchro = Utils::GetConfigurationValue('custom_synchro', '');
 		if (array_key_exists($sClass, $aCustomSynchro)) {
 			foreach ($aCustomSynchro[$sClass]['fields'] as $sAttCode => $aFieldsDef) {
 				// Check if the configuration contains an alteration of the JSON
@@ -138,7 +155,11 @@ class vSphereHypervisorCollector extends ConfigurableCollector
 	{
 		$value = '';
 		$aMatches = array();
-		if (preg_match('/^hardware->systemInfo->otherIdentifyingInfo\\[(.+)\\]$/', $sFieldDefinition, $aMatches)) {
+		if (preg_match(
+			'/^hardware->systemInfo->otherIdentifyingInfo\\[(.+)\\]$/',
+			$sFieldDefinition,
+			$aMatches
+		)) {
 			$bFound  = false;
 			// Special case for HostSystemIdentificationInfo object
 			foreach ($oHypervisor->hardware->systemInfo->otherIdentifyingInfo as $oValue) {
@@ -203,7 +224,14 @@ class vSphereHypervisorCollector extends ConfigurableCollector
 				)
 			);
 			$context = stream_context_create($aStreamContextOptions);
-			$fp = @stream_socket_client('ssl://' . $sHost, $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $context);
+			$fp = @stream_socket_client(
+				'ssl://' . $sHost,
+				$errno,
+				$errstr,
+				5,
+				STREAM_CLIENT_CONNECT,
+				$context
+			);
 			if ($fp === false) {
 				Utils::Log(LOG_CRIT, "Failed to connect to https://$sHost (Error $errno: $errstr)");
 				return false;

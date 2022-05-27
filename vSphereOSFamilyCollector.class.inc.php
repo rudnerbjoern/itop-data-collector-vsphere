@@ -14,7 +14,7 @@
 //   You should have received a copy of the GNU Affero General Public License
 //   along with this application. If not, see <http://www.gnu.org/licenses/>
 
-class vSphereOSFamilyCollector extends Collector
+class vSphereOSFamilyCollector extends ConfigurableCollector
 {
 	protected $idx;
 	protected $aOSFamily;
