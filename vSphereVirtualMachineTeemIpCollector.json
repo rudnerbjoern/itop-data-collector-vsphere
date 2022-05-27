@@ -211,7 +211,7 @@
 			"friendlyname": "virtualhost_id"
 		}
 	],
-	"user_delete_policy": "nobody",
+	"user_delete_policy": "$user_delete_policy$",
 	"url_icon": "",
 	"url_application": ""
 }

@@ -53,14 +53,6 @@
 			"friendlyname": "name"
 		},
 		{
-			"attcode": "speed",
-			"update": "0",
-			"reconcile": "0",
-			"update_policy": "master_locked",
-			"finalclass": "SynchroAttribute",
-			"friendlyname": "speed"
-		},
-		{
 			"attcode": "virtualmachine_id",
 			"update": "1",
 			"reconcile": "1",
@@ -70,7 +62,7 @@
 			"friendlyname": "virtualmachine_id"
 		}
 	],
-	"user_delete_policy": "nobody",
+	"user_delete_policy": "$user_delete_policy$",
 	"url_icon": "",
 	"url_application": ""
 }
