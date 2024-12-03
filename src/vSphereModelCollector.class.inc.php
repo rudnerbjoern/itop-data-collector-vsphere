@@ -19,6 +19,17 @@ class vSphereModelCollector extends vSphereCollector
 	protected $idx;
 	protected $aModels;
 
+	/**
+	 * @inheritdoc
+	 */
+	public function AttributeIsOptional($sAttCode)
+	{
+		// make Picture optional
+		if ($sAttCode == 'picture') return true;
+
+		return parent::AttributeIsOptional($sAttCode);
+	}
+
 	public function Prepare()
 	{
 		$bRet = parent::Prepare();
