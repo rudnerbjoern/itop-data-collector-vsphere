@@ -153,6 +153,30 @@
 			"reconcile": "0",
 			"update_policy": "master_unlocked",
 			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "patchmethod_id",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"reconciliation_attcode": "",
+			"finalclass": "SynchroAttExtKey"
+		},
+		{
+			"attcode": "patchgroup_id",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"reconciliation_attcode": "",
+			"finalclass": "SynchroAttExtKey"
+		},
+		{
+			"attcode": "patchreboot_id",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"reconciliation_attcode": "",
+			"finalclass": "SynchroAttExtKey"
 		}
 	],
 	"user_delete_policy": "administrators",

@@ -53,6 +53,11 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		if ($sAttCode == 'backupmethod') return true;
 		if ($sAttCode == 'backupdescription') return true;
 
+		// Patch Management is optional
+		if ($sAttCode == 'patchmethod_id') return true;
+		if ($sAttCode == 'patchgroup_id') return true;
+		if ($sAttCode == 'patchreboot_id') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 
