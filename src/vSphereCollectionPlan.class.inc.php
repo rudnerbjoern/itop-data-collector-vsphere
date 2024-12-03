@@ -15,6 +15,7 @@ class vSphereCollectionPlan extends CollectionPlan
 	private $bManageIpv6;
 	private $bManageLogicalInterfaces;
 	private $bBRCostCenterIsInstalled;
+	private $bCpuExtensionIsInstalled;
 
 	/**
 	 * @inheritdoc
@@ -66,6 +67,26 @@ class vSphereCollectionPlan extends CollectionPlan
 			}
 		} catch (Exception $e) {
 			$sMessage = 'Data model for vSphere is considered as NOT installed due to: '.$e->getMessage();
+			if (is_a($e, "IOException")) {
+				Utils::Log(LOG_ERR, $sMessage);
+				throw $e;
+			}
+		}
+
+		// Check if CPU extension is installed
+		Utils::Log(LOG_INFO, '---------- Check CPU Extension installation ----------');
+		$this->bCpuExtensionIsInstalled = false;
+		$oRestClient = new RestClient();
+		try {
+			$aResult = $oRestClient->Get('ModuleInstallation', 'SELECT ModuleInstallation WHERE name = \'br-cpu-extension\'', 'version, installed');
+			if (array_key_exists('objects', $aResult) && isset($aResult['objects'])) {
+				$this->bCpuExtensionIsInstalled = true;
+				Utils::Log(LOG_INFO, 'CPU Extension is installed');
+			} else {
+				Utils::Log(LOG_INFO, $sMessage = 'CPU Extension is NOT installed');
+			}
+		} catch (Exception $e) {
+			$sMessage = 'CPU Extension is considered as NOT installed due to: ' . $e->getMessage();
 			if (is_a($e, "IOException")) {
 				Utils::Log(LOG_ERR, $sMessage);
 				throw $e;
@@ -238,6 +259,16 @@ class vSphereCollectionPlan extends CollectionPlan
 	public function IsBRCostCenterInstalled(): bool
 	{
 		return $this->bBRCostCenterIsInstalled;
+	}
+
+	/**
+	 * Check if iTop-br-cpu-extension is installed
+	 *
+	 * @return bool
+	 */
+	public function IsCpuExtensionInstalled(): bool
+	{
+		return $this->bCpuExtensionIsInstalled;
 	}
 
 	/**

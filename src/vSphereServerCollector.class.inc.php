@@ -75,10 +75,16 @@ class vSphereServerCollector extends vSphereCollector
 		// Workstation ID is optional
 		if ($sAttCode == 'workstation_id') return true;
 
-		// CPU fields are optional
-		if ($sAttCode == 'cpu_sockets') return true;
-		if ($sAttCode == 'cpu_cores') return true;
-		if ($sAttCode == 'cpu_count') return true;
+		// CPU fields are optional, if not installed
+		if ($this->oCollectionPlan->IsCpuExtensionInstalled()) {
+			if ($sAttCode == 'cpu_sockets') return false;
+			if ($sAttCode == 'cpu_cores') return false;
+			if ($sAttCode == 'cpu_count') return false;
+		} else {
+			if ($sAttCode == 'cpu_sockets') return true;
+			if ($sAttCode == 'cpu_cores') return true;
+			if ($sAttCode == 'cpu_count') return true;
+		}
 
 		// Datacenter View is optional
 		if ($sAttCode == 'position_p') return true;
@@ -139,6 +145,9 @@ class vSphereServerCollector extends vSphereCollector
 			'osversion_id' => $aHyperV['osversion_id'],
 			'cpu' => $aHyperV['cpu'],
 			'ram' => $aHyperV['ram'],
+			'cpu_sockets' => $aHyperV['cpu_sockets'],
+			'cpu_cores' => $aHyperV['cpu_cores'],
+			'serialnumber' => $aHyperV['serialnumber'],
 		);
 
 		// Add the custom fields (if any)

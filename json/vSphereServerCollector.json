@@ -428,23 +428,23 @@
 		},
 		{
 			"attcode": "cpu_cores",
-			"update": "0",
+			"update": "1",
 			"reconcile": "0",
-			"update_policy": "master_unlocked",
+			"update_policy": "master_locked",
 			"finalclass": "SynchroAttribute"
 		},
 		{
 			"attcode": "cpu_count",
 			"update": "0",
 			"reconcile": "0",
-			"update_policy": "master_unlocked",
+			"update_policy": "write_if_empty",
 			"finalclass": "SynchroAttribute"
 		},
 		{
 			"attcode": "cpu_sockets",
-			"update": "0",
+			"update": "1",
 			"reconcile": "0",
-			"update_policy": "master_unlocked",
+			"update_policy": "master_locked",
 			"finalclass": "SynchroAttribute"
 		},
 		{

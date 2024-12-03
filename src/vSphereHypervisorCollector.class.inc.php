@@ -114,6 +114,14 @@ class vSphereHypervisorCollector extends vSphereCollector
 					}
 				}
 
+				// get the serial number is not that easy...
+				$sSerialNumber = 'unknown';
+				foreach ($oHypervisor->hardware->systemInfo->otherIdentifyingInfo as $oTstSN) {
+					if ($oTstSN->identifierType->key == 'ServiceTag') {
+						$sSerialNumber = $oTstSN->identifierValue;
+					}
+				}
+
 				Utils::Log(LOG_DEBUG, "Server {$oHypervisor->name}: {$oHypervisor->hardware->systemInfo->vendor} {$oHypervisor->hardware->systemInfo->model}");
 				Utils::Log(LOG_DEBUG, "Server software: {$oHypervisor->config->product->fullName} - API Version: {$oHypervisor->config->product->apiVersion}");
 
@@ -131,12 +139,31 @@ class vSphereHypervisorCollector extends vSphereCollector
 					'status' => 'production',
 					'farm_id' => $sFarmName,
 					'server_id' => $oHypervisor->name,
+					'serialnumber' => $sSerialNumber,
 				);
 
 				$oCollectionPlan = vSphereCollectionPlan::GetPlan();
 				if ($oCollectionPlan->IsCbdVMwareDMInstalled()) {
 					$aHypervisorData['uuid'] = ($oHypervisor->hardware->systemInfo->uuid) ?? '';
 					$aHypervisorData['hostid'] = $oHypervisor->getReferenceId();
+				}
+
+				// get extended CPU info
+				if ($oCollectionPlan->IsCpuExtensionInstalled()) {
+					$sCpuName = '';
+					$iCpuSockets = (int)$oHypervisor->hardware->cpuInfo->numCpuPackages;
+					$iCpuCores = (int)$oHypervisor->hardware->cpuInfo->numCpuCores;
+					if ($iCpuSockets > 0) {
+						$iCpuCores = (int)($oHypervisor->hardware->cpuInfo->numCpuCores / $iCpuSockets);
+					}
+					foreach ($oHypervisor->hardware->cpuPkg as $oTstCpu) {
+						$sCpuName = $oTstCpu->description;
+						break;
+					}
+
+					$aHypervisorData['cpu']  = $sCpuName;
+					$aHypervisorData['cpu_sockets'] = $iCpuSockets;
+					$aHypervisorData['cpu_cores'] = $iCpuCores;
 				}
 
 				foreach (static::GetCustomFields(__CLASS__) as $sAttCode => $sFieldDefinition) {
