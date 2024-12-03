@@ -446,6 +446,13 @@
 			"reconcile": "0",
 			"update_policy": "master_unlocked",
 			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "position_v",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
 		}
 	],
 	"user_delete_policy": "administrators",

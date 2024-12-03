@@ -80,6 +80,9 @@ class vSphereServerCollector extends vSphereCollector
 		if ($sAttCode == 'cpu_cores') return true;
 		if ($sAttCode == 'cpu_count') return true;
 
+		// Datacenter View is optional
+		if ($sAttCode == 'position_v') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 
