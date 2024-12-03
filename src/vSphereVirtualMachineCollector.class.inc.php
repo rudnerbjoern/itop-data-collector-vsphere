@@ -68,6 +68,9 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		if ($sAttCode == 'bcm_rpo') return true;
 		if ($sAttCode == 'bcm_mtd') return true;
 
+		// Workstation ID is optional
+		if ($sAttCode == 'workstation_id') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 
