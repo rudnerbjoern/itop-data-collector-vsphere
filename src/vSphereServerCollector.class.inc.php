@@ -101,6 +101,9 @@ class vSphereServerCollector extends vSphereCollector
 		if ($sAttCode == 'monitoringprobe_id') return true;
 		if ($sAttCode == 'monitoringip_id') return true;
 
+		// Express Service Code is optional
+		if ($sAttCode == 'express_service_code') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 

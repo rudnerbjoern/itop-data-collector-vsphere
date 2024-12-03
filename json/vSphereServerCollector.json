@@ -525,6 +525,13 @@
 			"update_policy": "master_unlocked",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey"
+		},
+		{
+			"attcode": "express_service_code",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
 		}
 	],
 	"user_delete_policy": "administrators",
