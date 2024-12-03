@@ -448,7 +448,56 @@
 			"finalclass": "SynchroAttribute"
 		},
 		{
+			"attcode": "position_p",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
 			"attcode": "position_v",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "position_h",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "nb_u",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "nb_cols",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "zero_u",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "expected_power_input",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "weight",
 			"update": "0",
 			"reconcile": "0",
 			"update_policy": "master_unlocked",

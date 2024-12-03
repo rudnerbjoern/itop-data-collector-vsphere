@@ -81,7 +81,14 @@ class vSphereServerCollector extends vSphereCollector
 		if ($sAttCode == 'cpu_count') return true;
 
 		// Datacenter View is optional
+		if ($sAttCode == 'position_p') return true;
 		if ($sAttCode == 'position_v') return true;
+		if ($sAttCode == 'position_h') return true;
+		if ($sAttCode == 'nb_u') return true;
+		if ($sAttCode == 'nb_cols') return true;
+		if ($sAttCode == 'zero_u') return true;
+		if ($sAttCode == 'expected_power_input') return true;
+		if ($sAttCode == 'weight') return true;
 
 		// Monitoring is optional
 		if ($sAttCode == 'monitoringstatus') return true;
