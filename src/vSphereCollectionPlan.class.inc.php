@@ -14,6 +14,7 @@ class vSphereCollectionPlan extends CollectionPlan
 	private $sDefaultIpStatus;
 	private $bManageIpv6;
 	private $bManageLogicalInterfaces;
+	private $bBRCostCenterIsInstalled;
 
 	/**
 	 * @inheritdoc
@@ -65,6 +66,26 @@ class vSphereCollectionPlan extends CollectionPlan
 			}
 		} catch (Exception $e) {
 			$sMessage = 'Data model for vSphere is considered as NOT installed due to: '.$e->getMessage();
+			if (is_a($e, "IOException")) {
+				Utils::Log(LOG_ERR, $sMessage);
+				throw $e;
+			}
+		}
+
+		// Check if CostCenter is installed
+		Utils::Log(LOG_INFO, '---------- Check Data model for CostCenter installation ----------');
+		$this->bBRCostCenterIsInstalled = false;
+		$oRestClient = new RestClient();
+		try {
+			$aResult = $oRestClient->Get('CostCenter', 'SELECT CostCenter WHERE id = 0');
+			if ($aResult['code'] == 0) {
+				$this->bBRCostCenterIsInstalled = true;
+				Utils::Log(LOG_INFO, 'Data model for CostCenter is installed');
+			} else {
+				Utils::Log(LOG_INFO, $sMessage = 'Data model for CostCenter is NOT installed');
+			}
+		} catch (Exception $e) {
+			$sMessage = 'Data model for CostCenter is considered as NOT installed due to: ' . $e->getMessage();
 			if (is_a($e, "IOException")) {
 				Utils::Log(LOG_ERR, $sMessage);
 				throw $e;
@@ -207,6 +228,16 @@ class vSphereCollectionPlan extends CollectionPlan
 	public function IsCbdVMwareDMInstalled(): bool
 	{
 		return $this->bCbdVMwareDMIsInstalled;
+	}
+
+	/**
+	 * Check if iTop-br-costcenter is installed
+	 *
+	 * @return bool
+	 */
+	public function IsBRCostCenterInstalled(): bool
+	{
+		return $this->bBRCostCenterIsInstalled;
 	}
 
 	/**

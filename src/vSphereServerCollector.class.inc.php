@@ -46,6 +46,10 @@ class vSphereServerCollector extends vSphereCollector
 		} else {
 			if ($sAttCode == 'hostid') return true;
 		}
+
+		// Cost Center is optional
+		if ($sAttCode == 'costcenter_id') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 

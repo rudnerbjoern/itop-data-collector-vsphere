@@ -28,6 +28,9 @@ class vSphereHypervisorCollector extends vSphereCollector
 			if ($sAttCode == 'hostid') return true;
 		}
 
+		// Cost Center is optional
+		if ($sAttCode == 'costcenter_id') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 

@@ -5,7 +5,7 @@ class vSphereFarmCollector extends vSphereCollector
 {
 	protected $idx;
 	static protected $aFarms = null;
-	
+
 	public function AttributeIsOptional($sAttCode)
 	{
 		// If the module Service Management for Service Providers is selected during the setup
@@ -16,9 +16,12 @@ class vSphereFarmCollector extends vSphereCollector
 		// on Servers. Let's safely ignore it.
 		if ($sAttCode == 'providercontracts_list') return true;
 
+		// Cost Center is optional
+		if ($sAttCode == 'costcenter_id') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
-	
+
 	static public function GetFarms()
 	{
 		if (self::$aFarms === null)
@@ -38,7 +41,7 @@ class vSphereFarmCollector extends vSphereCollector
 			$vhost = new \Vmwarephp\Vhost($sVSphereServer, $sLogin, $sPassword);
 			$aFarms = $vhost->findAllManagedObjects('ClusterComputeResource', array('configurationEx'));
 			self::$aFarms = array();
-			
+
 			foreach($aFarms as $oFarm)
 			{
 				Utils::Log(LOG_DEBUG, 'Farm->name: '.$oFarm->name);
@@ -50,19 +53,18 @@ class vSphereFarmCollector extends vSphereCollector
 						$aHosts[] = $oHost->name;
 					}
 				}
-				
+
 				self::$aFarms[] = array(
 					'id' => $oFarm->name,
 					'name' => $oFarm->name,
 					'org_id' => $sDefaultOrg,
 					'hosts' => $aHosts,
 				);
-
-			}			
+			}
 		}
 		return self::$aFarms;
 	}
-	
+
 	public function Prepare()
 	{
 		$bRet = parent::Prepare();

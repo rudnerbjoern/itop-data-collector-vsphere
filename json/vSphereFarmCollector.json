@@ -124,6 +124,14 @@
 			"value_separator": ":",
 			"attribute_qualifier": "'",
 			"finalclass": "SynchroAttLinkSet"
+		},
+		{
+			"attcode": "costcenter_id",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"reconciliation_attcode": "",
+			"finalclass": "SynchroAttExtKey"
 		}
 	],
 	"user_delete_policy": "administrators",
