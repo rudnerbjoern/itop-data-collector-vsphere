@@ -329,6 +329,13 @@
 			"finalclass": "SynchroAttribute"
 		},
 		{
+			"attcode": "monitoringparameter",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
 			"attcode": "monitoringprobe_id",
 			"update": "0",
 			"reconcile": "0",
@@ -338,9 +345,9 @@
 		},
 		{
 			"attcode": "monitoringip_id",
-			"update": "0",
+			"update": "1",
 			"reconcile": "0",
-			"update_policy": "master_unlocked",
+			"update_policy": "write_if_empty",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey"
 		}

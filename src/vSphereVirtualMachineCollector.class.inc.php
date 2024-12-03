@@ -71,10 +71,15 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		// Workstation ID is optional
 		if ($sAttCode == 'workstation_id') return true;
 
-		// Monitoring is optional
+		// Monitoring is optional, if not installed
 		if ($sAttCode == 'monitoringstatus') return true;
+		if ($sAttCode == 'monitoringparameter') return true;
 		if ($sAttCode == 'monitoringprobe_id') return true;
-		if ($sAttCode == 'monitoringip_id') return true;
+		if ($this->oCollectionPlan->IsMonitoringExtensionInstalled()) {
+			if ($sAttCode == 'monitoringip_id') return false;
+		} else {
+			if ($sAttCode == 'monitoringip_id') return true;
+		}
 
 		return parent::AttributeIsOptional($sAttCode);
 	}
@@ -336,6 +341,10 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 			$aData['managementip_id'] = $sGuestIP;
 			utils::Log(LOG_DEBUG, "Setting managementip_id: ".$sGuestIP);
 			$aData['short_name'] = $sGuestShortName;
+
+			if ($oCollectionPlan->IsMonitoringExtensionInstalled()) {
+				$aData['monitoringip_id'] = $sGuestIP;
+			}
 		} else {
 			// ManagementIP cannot be an IPV6 address, if no IPV4 was found above, let's clear the field
 			// Note: some OpenVM clients report IP addresses with a trailing space, so let's trim the field
@@ -485,6 +494,9 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 
 		if ($this->oCollectionPlan->IsTeemIpInstalled()) {
 			$aData['managementip_id'] = $aVM['managementip_id'];
+			if ($this->oCollectionPlan->IsMonitoringExtensionInstalled()) {
+				$aData['monitoringip_id'] = $aVM['monitoringip_id'];
+			}
 		} else {
 			$aData['managementip'] = $aVM['managementip'];
 		}
@@ -525,6 +537,9 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		$this->oOSVersionLookup->Lookup($aLineData, array('osfamily_id', 'osversion_id'), 'osversion_id', $iLineIndex);
 		if ($this->oCollectionPlan->IsTeemIpInstalled()) {
 			$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'managementip_id'), 'managementip_id', $iLineIndex);
+			if ($this->oCollectionPlan->IsMonitoringExtensionInstalled()) {
+				$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'monitoringip_id'), 'monitoringip_id', $iLineIndex);
+			}
 		}
 	}
 }

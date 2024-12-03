@@ -62,6 +62,7 @@ class vSphereIPv4AddressCollector extends vSphereCollector
 	public function GetIPv4Addresses()
 	{
 		$sDefaultOrg = Utils::GetConfigurationValue('default_org_id');
+		$sDefaultIPv4Org = Utils::GetConfigurationValue('default_ipv4_org_id');
 
 		$sDefaulIpStatus = $this->oCollectionPlan->GetTeemIpOption('default_ip_status');
 		if (class_exists('vSphereVirtualMachineCollector')) {
@@ -79,8 +80,8 @@ class vSphereIPv4AddressCollector extends vSphereCollector
 						$this->aIPv4Addresses[] = array(
 							'id' => $sIP,
 							'ip' => $sIP,
-							'org_id' => $sDefaultOrg,
-							'ipconfig_id' => $sDefaultOrg,
+							'org_id' => $sDefaultIPv4Org,
+							'ipconfig_id' => $sDefaultIPv4Org,
 							'short_name' => $sShortName,
 							'status' => $this->oCollectionPlan->GetTeemIpOption('default_ip_status'),
 						);
@@ -99,8 +100,8 @@ class vSphereIPv4AddressCollector extends vSphereCollector
 						$this->aIPv4Addresses[] = array(
 							'id' => $sIP,
 							'ip' => $sIP,
-							'org_id' => $sDefaultOrg,
-							'ipconfig_id' => $sDefaultOrg,
+							'org_id' => $sDefaultIPv4Org,
+							'ipconfig_id' => $sDefaultIPv4Org,
 							'short_name' => '',
 							'status' => $sDefaulIpStatus,
 						);
@@ -126,8 +127,8 @@ class vSphereIPv4AddressCollector extends vSphereCollector
 							$this->aIPv4Addresses[] = array(
 								'id' => $sIP,
 								'ip' => $sIP,
-								'org_id' => $sDefaultOrg,
-								'ipconfig_id' => $sDefaultOrg,
+								'org_id' => $sDefaultIPv4Org,
+								'ipconfig_id' => $sDefaultIPv4Org,
 								'short_name' => '',
 								'status' => $sDefaulIpStatus,
 							);

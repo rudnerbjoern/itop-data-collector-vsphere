@@ -53,8 +53,9 @@ class vSphereHypervisorCollector extends vSphereCollector
 		if ($sAttCode == 'bcm_rpo') return true;
 		if ($sAttCode == 'bcm_mtd') return true;
 
-		// Monitoring is optional
+		// Monitoring is optional, if not installed
 		if ($sAttCode == 'monitoringstatus') return true;
+		if ($sAttCode == 'monitoringparameter') return true;
 		if ($sAttCode == 'monitoringprobe_id') return true;
 		if ($sAttCode == 'monitoringip_id') return true;
 

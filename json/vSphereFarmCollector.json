@@ -242,6 +242,13 @@
 			"finalclass": "SynchroAttribute"
 		},
 		{
+			"attcode": "monitoringparameter",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
 			"attcode": "monitoringprobe_id",
 			"update": "0",
 			"reconcile": "0",

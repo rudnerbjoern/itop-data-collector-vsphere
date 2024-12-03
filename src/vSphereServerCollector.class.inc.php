@@ -96,10 +96,15 @@ class vSphereServerCollector extends vSphereCollector
 		if ($sAttCode == 'expected_power_input') return true;
 		if ($sAttCode == 'weight') return true;
 
-		// Monitoring is optional
+		// Monitoring is optional, if not installed
 		if ($sAttCode == 'monitoringstatus') return true;
+		if ($sAttCode == 'monitoringparameter') return true;
 		if ($sAttCode == 'monitoringprobe_id') return true;
-		if ($sAttCode == 'monitoringip_id') return true;
+		if ($this->oCollectionPlan->IsMonitoringExtensionInstalled()) {
+			if ($sAttCode == 'monitoringip_id') return false;
+		} else {
+			if ($sAttCode == 'monitoringip_id') return true;
+		}
 
 		// Express Service Code is optional
 		if ($sAttCode == 'express_service_code') return true;
@@ -180,6 +185,10 @@ class vSphereServerCollector extends vSphereCollector
 
 			unset($aData['managementip']);
 			$aData['managementip_id'] = $sIP;
+
+			if ($oCollectionPlan->IsMonitoringExtensionInstalled()) {
+				$aData['monitoringip_id'] = $sIP;
+			}
 		}
 
 		return $aData;
@@ -264,6 +273,9 @@ class vSphereServerCollector extends vSphereCollector
 		$this->oModelLookup->Lookup($aLineData, array('brand_id', 'model_id'), 'model_id', $iLineIndex);
 		if ($this->oCollectionPlan->IsTeemIpInstalled()) {
 			$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'managementip_id'), 'managementip_id', $iLineIndex);
+			if ($this->oCollectionPlan->IsMonitoringExtensionInstalled()) {
+				$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'monitoringip_id'), 'monitoringip_id', $iLineIndex);
+			}
 		}
 	}
 }

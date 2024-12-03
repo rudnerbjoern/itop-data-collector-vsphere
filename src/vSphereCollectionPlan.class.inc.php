@@ -16,6 +16,7 @@ class vSphereCollectionPlan extends CollectionPlan
 	private $bManageLogicalInterfaces;
 	private $bBRCostCenterIsInstalled;
 	private $bCpuExtensionIsInstalled;
+	private $bMonitoringExtensionIsInstalled;
 
 	/**
 	 * @inheritdoc
@@ -87,6 +88,26 @@ class vSphereCollectionPlan extends CollectionPlan
 			}
 		} catch (Exception $e) {
 			$sMessage = 'CPU Extension is considered as NOT installed due to: ' . $e->getMessage();
+			if (is_a($e, "IOException")) {
+				Utils::Log(LOG_ERR, $sMessage);
+				throw $e;
+			}
+		}
+
+		// Check if Monitoring extension is installed
+		Utils::Log(LOG_INFO, '---------- Check Monitoring Extension installation ----------');
+		$this->bMonitoringExtensionIsInstalled = false;
+		$oRestClient = new RestClient();
+		try {
+			$aResult = $oRestClient->Get('ModuleInstallation', 'SELECT ModuleInstallation WHERE name = \'br-monitoring\'', 'version, installed');
+			if (array_key_exists('objects', $aResult) && isset($aResult['objects'])) {
+				$this->bMonitoringExtensionIsInstalled = true;
+				Utils::Log(LOG_INFO, 'Monitoring Extension is installed');
+			} else {
+				Utils::Log(LOG_INFO, $sMessage = 'Monitoring Extension is NOT installed');
+			}
+		} catch (Exception $e) {
+			$sMessage = 'Monitoring Extension is considered as NOT installed due to: ' . $e->getMessage();
 			if (is_a($e, "IOException")) {
 				Utils::Log(LOG_ERR, $sMessage);
 				throw $e;
@@ -269,6 +290,16 @@ class vSphereCollectionPlan extends CollectionPlan
 	public function IsCpuExtensionInstalled(): bool
 	{
 		return $this->bCpuExtensionIsInstalled;
+	}
+
+	/**
+	 * Check if iTop-br-monitoring is installed
+	 *
+	 * @return bool
+	 */
+	public function IsMonitoringExtensionInstalled(): bool
+	{
+		return $this->bMonitoringExtensionIsInstalled;
 	}
 
 	/**
