@@ -83,6 +83,11 @@ class vSphereServerCollector extends vSphereCollector
 		// Datacenter View is optional
 		if ($sAttCode == 'position_v') return true;
 
+		// Monitoring is optional
+		if ($sAttCode == 'monitoringstatus') return true;
+		if ($sAttCode == 'monitoringprobe_id') return true;
+		if ($sAttCode == 'monitoringip_id') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 

@@ -71,6 +71,11 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		// Workstation ID is optional
 		if ($sAttCode == 'workstation_id') return true;
 
+		// Monitoring is optional
+		if ($sAttCode == 'monitoringstatus') return true;
+		if ($sAttCode == 'monitoringprobe_id') return true;
+		if ($sAttCode == 'monitoringip_id') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 
