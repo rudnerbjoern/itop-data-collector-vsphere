@@ -75,6 +75,11 @@ class vSphereServerCollector extends vSphereCollector
 		// Workstation ID is optional
 		if ($sAttCode == 'workstation_id') return true;
 
+		// CPU fields are optional
+		if ($sAttCode == 'cpu_sockets') return true;
+		if ($sAttCode == 'cpu_cores') return true;
+		if ($sAttCode == 'cpu_count') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 

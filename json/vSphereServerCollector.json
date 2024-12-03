@@ -425,6 +425,27 @@
 			"update_policy": "master_unlocked",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey"
+		},
+		{
+			"attcode": "cpu_cores",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "cpu_count",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "cpu_sockets",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
 		}
 	],
 	"user_delete_policy": "administrators",
