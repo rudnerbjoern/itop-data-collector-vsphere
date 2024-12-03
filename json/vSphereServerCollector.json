@@ -323,6 +323,20 @@
 			"update_policy": "master_unlocked",
 			"reconciliation_attcode": "",
 			"finalclass": "SynchroAttExtKey"
+		},
+		{
+			"attcode": "backupmethod",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "backupdescription",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
 		}
 	],
 	"user_delete_policy": "administrators",

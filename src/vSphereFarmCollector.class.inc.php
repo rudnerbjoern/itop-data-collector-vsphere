@@ -22,6 +22,10 @@ class vSphereFarmCollector extends vSphereCollector
 		// Cost Center is optional
 		if ($sAttCode == 'costcenter_id') return true;
 
+		//  Backup Management is optional
+		if ($sAttCode == 'backupmethod') return true;
+		if ($sAttCode == 'backupdescription') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 
