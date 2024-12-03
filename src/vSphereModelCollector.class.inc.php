@@ -27,6 +27,10 @@ class vSphereModelCollector extends vSphereCollector
 		// make Picture optional
 		if ($sAttCode == 'picture') return true;
 
+		// make Lifecycle Management optional
+		if ($sAttCode == 'eol') return true;
+		if ($sAttCode == 'eosl') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 

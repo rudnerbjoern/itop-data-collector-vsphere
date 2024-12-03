@@ -19,6 +19,19 @@ class vSphereOSVersionCollector extends Collector
 	protected $idx;
 	protected $aOSVersion;
 
+	/**
+	 * @inheritdoc
+	 */
+	public function AttributeIsOptional($sAttCode)
+	{
+		// make Lifecycle Management optional
+		if ($sAttCode == 'eol') return true;
+		if ($sAttCode == 'eomss') return true;
+		if ($sAttCode == 'eoesu') return true;
+
+		return parent::AttributeIsOptional($sAttCode);
+	}
+
 	public function Prepare()
 	{
 		$bRet = parent::Prepare();

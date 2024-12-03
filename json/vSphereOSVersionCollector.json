@@ -30,6 +30,27 @@
 			"update_policy": "master_locked",
 			"reconciliation_attcode": "name",
 			"finalclass": "SynchroAttExtKey"
+		},
+		{
+			"attcode": "eol",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "eoesu",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
+			"attcode": "eomss",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
 		}
 	],
 	"user_delete_policy": "administrators",
