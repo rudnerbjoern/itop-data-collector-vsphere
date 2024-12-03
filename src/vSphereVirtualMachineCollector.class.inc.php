@@ -43,6 +43,9 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 			if ($sAttCode == 'managementip_id') return true;
 		}
 
+		// System Landscape is optional
+		if ($sAttCode == 'system_landscape') return true;
+				
 		// Cost Center is optional
 		if ($sAttCode == 'costcenter_id') return true;
 

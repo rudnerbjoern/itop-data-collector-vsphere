@@ -16,6 +16,9 @@ class vSphereFarmCollector extends vSphereCollector
 		// on Servers. Let's safely ignore it.
 		if ($sAttCode == 'providercontracts_list') return true;
 
+		// System Landscape is optional
+		if ($sAttCode == 'system_landscape') return true;
+
 		// Cost Center is optional
 		if ($sAttCode == 'costcenter_id') return true;
 

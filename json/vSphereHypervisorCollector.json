@@ -138,6 +138,13 @@
 			"finalclass": "SynchroAttribute"
 		},
 		{
+			"attcode": "system_landscape",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"finalclass": "SynchroAttribute"
+		},
+		{
 			"attcode": "tickets_list",
 			"update": "0",
 			"reconcile": "0",
