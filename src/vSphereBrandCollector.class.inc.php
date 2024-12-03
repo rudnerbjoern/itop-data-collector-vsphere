@@ -6,6 +6,17 @@ class vSphereBrandCollector extends vSphereCollector
 	protected $idx;
 	protected $aBrands;
 
+	/**
+	 * @inheritdoc
+	 */
+	public function AttributeIsOptional($sAttCode)
+	{
+		// make Logo optional
+		if ($sAttCode == 'logo') return true;
+
+		return parent::AttributeIsOptional($sAttCode);
+	}
+
 	public function Prepare()
 	{
 		$bRet = parent::Prepare();
