@@ -62,6 +62,16 @@ class vSphereServerCollector extends vSphereCollector
 		if ($sAttCode == 'patchgroup_id') return true;
 		if ($sAttCode == 'patchreboot_id') return true;
 
+		// Risk Management is optional
+		if ($sAttCode == 'rm_confidentiality') return true;
+		if ($sAttCode == 'rm_integrity') return true;
+		if ($sAttCode == 'rm_availability') return true;
+		if ($sAttCode == 'rm_authenticity') return true;
+		if ($sAttCode == 'rm_nonrepudiation') return true;
+		if ($sAttCode == 'bcm_rto') return true;
+		if ($sAttCode == 'bcm_rpo') return true;
+		if ($sAttCode == 'bcm_mtd') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 
