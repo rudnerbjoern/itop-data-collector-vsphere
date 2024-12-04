@@ -64,6 +64,16 @@ class vSphereDatastoreCollector extends vSphereCollector
 		foreach ($aDatastores as $oDatastore) {
 			Utils::Log(LOG_DEBUG, "Datastore {$oDatastore->name}");
 
+			// HACK: Get info on bound to HyperVisor
+			$sHypervisorId = '';
+			if ($oDatastore->summary->multipleHostAccess != 1) {
+				// Datastore has no multpile host access -> it is local?
+				$sDatastoreName = $oDatastore->name;
+				if (str_ends_with($sDatastoreName, "_local1")) {
+					$sHypervisorId = substr($sDatastoreName, 0, -strlen("_local1"));
+				}
+			}
+
 			$aDatastoreData = array(
 				'id' => $oDatastore->getReferenceId(),
 				'primary_key' => $oDatastore->getReferenceId(),
@@ -74,6 +84,7 @@ class vSphereDatastoreCollector extends vSphereCollector
 				'capacity' => (int)($oDatastore->summary->capacity / (1024 * 1024 * 1024)),
 				'status' => 'production',
 				'mountingpoint' => $oDatastore->summary->url,
+				'hypervisor_id' => $sHypervisorId,
 			);
 
 			$this->aDatastores[] = $aDatastoreData;
