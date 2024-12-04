@@ -172,7 +172,7 @@ class vSphereServerCollector extends vSphereCollector
 			$bCollectIps = ($aTeemIpOptions['collect_ips'] == 'yes') ? true : false;
 			$bCollectIPv6Addresses = ($aTeemIpOptions['manage_ipv6'] == 'yes') ? true : false;
 
-			$sName = $aHyperV['name'] ?? '';
+			$sName = $aHyperV['managementip'] ?? '';
 			$sIP = '';
 			if ($bCollectIps == 'yes') {
 				// Check if name has IPv4 or "IPv6" format

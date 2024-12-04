@@ -118,8 +118,17 @@ class vSphereHypervisorCollector extends vSphereCollector
 				// get the serial number is not that easy...
 				$sSerialNumber = 'unknown';
 				foreach ($oHypervisor->hardware->systemInfo->otherIdentifyingInfo as $oTstSN) {
-					if ($oTstSN->identifierType->key == 'ServiceTag') {
+					if ($oTstSN->identifierType->key == 'SerialNumberTag') {
 						$sSerialNumber = $oTstSN->identifierValue;
+					}
+				}
+
+				// management_ip quest
+				$sManagementIp = '';
+				foreach ($oHypervisor->config->option as $oTstIP) {
+					if ($oTstIP->key == 'Vpx.Vpxa.config.host_ip') {
+						$sManagementIp = $oTstIP->value;
+						break;
 					}
 				}
 
@@ -141,6 +150,7 @@ class vSphereHypervisorCollector extends vSphereCollector
 					'farm_id' => $sFarmName,
 					'server_id' => $oHypervisor->name,
 					'serialnumber' => $sSerialNumber,
+					'managementip' => $sManagementIp,
 				);
 
 				$oCollectionPlan = vSphereCollectionPlan::GetPlan();
