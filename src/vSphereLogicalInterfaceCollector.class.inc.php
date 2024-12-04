@@ -38,6 +38,10 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 		if ($sAttCode == 'vlans_list') return true;
 		if ($sAttCode == 'vrfs_list') return true;
 
+		// Monitoring is optional
+		if ($sAttCode == 'monitoringstatus') return true;
+		if ($sAttCode == 'monitoringparameter') return true;
+
 		return parent::AttributeIsOptional($sAttCode);
 	}
 
