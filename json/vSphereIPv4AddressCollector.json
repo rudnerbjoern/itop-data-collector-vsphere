@@ -149,7 +149,7 @@
 			"attcode": "short_name",
 			"update": "1",
 			"reconcile": "0",
-			"update_policy": "master_locked",
+			"update_policy": "write_if_empty",
 			"finalclass": "SynchroAttribute"
 		},
 		{
