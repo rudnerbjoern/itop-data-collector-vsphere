@@ -75,6 +75,10 @@ class vSphereServerCollector extends vSphereCollector
 		// Workstation ID is optional
 		if ($sAttCode == 'workstation_id') return true;
 
+		// PowerSockets are optional
+		if ($sAttCode == 'powerAsocket_id') return true;
+		if ($sAttCode == 'powerBsocket_id') return true;
+
 		// CPU fields are optional, if not installed
 		if ($this->oCollectionPlan->IsCpuExtensionInstalled()) {
 			if ($sAttCode == 'cpu_sockets') return false;

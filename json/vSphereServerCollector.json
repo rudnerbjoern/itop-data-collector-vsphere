@@ -427,6 +427,22 @@
 			"finalclass": "SynchroAttExtKey"
 		},
 		{
+			"attcode": "powerAsocket_id",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"reconciliation_attcode": "",
+			"finalclass": "SynchroAttExtKey"
+		},
+		{
+			"attcode": "powerBsocket_id",
+			"update": "0",
+			"reconcile": "0",
+			"update_policy": "master_unlocked",
+			"reconciliation_attcode": "",
+			"finalclass": "SynchroAttExtKey"
+		},
+		{
 			"attcode": "cpu_cores",
 			"update": "1",
 			"reconcile": "0",
