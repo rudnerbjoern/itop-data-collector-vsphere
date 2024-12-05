@@ -63,6 +63,7 @@ class vSphereIPv4AddressCollector extends vSphereCollector
 	{
 		$sDefaultOrg = Utils::GetConfigurationValue('default_org_id');
 		$sDefaultIPv4Org = Utils::GetConfigurationValue('default_ipv4_org_id');
+		if ($sDefaultIPv4Org == '') $sDefaultIPv4Org = $sDefaultOrg;
 
 		$sDefaulIpStatus = $this->oCollectionPlan->GetTeemIpOption('default_ip_status');
 		if (class_exists('vSphereVirtualMachineCollector')) {
