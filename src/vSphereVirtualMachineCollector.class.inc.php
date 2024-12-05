@@ -335,7 +335,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 				$sGuestIP = '';
 			} else {
 				if (!$bCollectIPv6Addresses) {
-					$sGuestIP = (strpos($sGuestIP, ':') !== false) ? '' : $sGuestIP;
+					$sGuestIP = (filter_var($sGuestIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ? '' : $sGuestIP;
 				}
 			}
 
@@ -349,7 +349,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		} else {
 			// ManagementIP cannot be an IPV6 address, if no IPV4 was found above, let's clear the field
 			// Note: some OpenVM clients report IP addresses with a trailing space, so let's trim the field
-			$aData['managementip'] = (strpos($sGuestIP, ':') !== false) ? '' : trim($sGuestIP);
+			$aData['managementip'] = (filter_var($sGuestIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ? '' : trim($sGuestIP);
 		}
 
 		return $aData;
