@@ -5,8 +5,10 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 {
 	protected $idx;
 	protected $oVMLookup;
-	static protected $aLogicalInterfaces = null;
-	static protected $aLnkLogicalInterfaceToIPAddress = null;
+    static protected bool $bLogicalInterfacesCollected = false;
+	static protected array $aLogicalInterfaces = [];
+    static protected bool $bLnkLogicalInterfaceToIPAddressCollected = false;
+	static protected array $aLnkLogicalInterfaceToIPAddress = [];
 
 	/**
 	 * @inheritdoc
@@ -47,7 +49,8 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 
 	static public function GetLogicalInterfaces()
 	{
-		if (self::$aLogicalInterfaces === null) {
+		if (!self::$bLogicalInterfacesCollected) {
+            self::$bLogicalInterfacesCollected = true;
 			$aVMs = vSphereVirtualMachineCollector::GetVMs();
 
 			$aLogicalInterfaces = array();
@@ -95,7 +98,8 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 
 	static public function GetLnks()
 	{
-		if (self::$aLnkLogicalInterfaceToIPAddress === null) {
+		if (!self::$bLnkLogicalInterfaceToIPAddressCollected) {
+            self::$bLnkLogicalInterfaceToIPAddressCollected = true;
 			self::GetLogicalInterfaces();
 		}
 

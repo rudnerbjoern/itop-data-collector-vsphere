@@ -1,10 +1,11 @@
 <?php
-require_once(APPROOT.'collectors/src/vSphereCollector.class.inc.php');
+require_once(APPROOT . 'collectors/src/vSphereCollector.class.inc.php');
 
 class vSphereFarmCollector extends vSphereCollector
 {
 	protected $idx;
-	static protected $aFarms = null;
+	static protected bool $bFarmsCollected = false;
+	static protected array $aFarms = [];
 
 	public function AttributeIsOptional($sAttCode)
 	{
@@ -52,8 +53,8 @@ class vSphereFarmCollector extends vSphereCollector
 
 	static public function GetFarms()
 	{
-		if (self::$aFarms === null)
-		{
+		if (!self::$bFarmsCollected) {
+			self::$bFarmsCollected = true;
 			$sVSphereServer = Utils::GetConfigurationValue('vsphere_uri', '');
 			$sLogin = Utils::GetConfigurationValue('vsphere_login', '');
 			$sPassword = Utils::GetConfigurationValue('vsphere_password', '');
@@ -70,14 +71,11 @@ class vSphereFarmCollector extends vSphereCollector
 			$aFarms = $vhost->findAllManagedObjects('ClusterComputeResource', array('configurationEx'));
 			self::$aFarms = array();
 
-			foreach($aFarms as $oFarm)
-			{
-				Utils::Log(LOG_DEBUG, 'Farm->name: '.$oFarm->name);
+			foreach ($aFarms as $oFarm) {
+				Utils::Log(LOG_DEBUG, 'Farm->name: ' . $oFarm->name);
 				$aHosts = array();
-				foreach($oFarm->host as $oHost)
-				{
-					if (is_object($oHost))
-					{
+				foreach ($oFarm->host as $oHost) {
+					if (is_object($oHost)) {
 						$aHosts[] = $oHost->name;
 					}
 				}
@@ -106,13 +104,12 @@ class vSphereFarmCollector extends vSphereCollector
 
 	public function Fetch()
 	{
-		if ($this->idx < count(self::$aFarms))
-		{
+		if ($this->idx < count(self::$aFarms)) {
 			$aFarm = self::$aFarms[$this->idx++];
 			return array(
-					'primary_key' => $aFarm['id'],
-					'name' => $aFarm['name'],
-					'org_id' => $aFarm['org_id'],
+				'primary_key' => $aFarm['id'],
+				'name' => $aFarm['name'],
+				'org_id' => $aFarm['org_id'],
 			);
 		}
 		return false;

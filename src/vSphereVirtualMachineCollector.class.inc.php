@@ -4,25 +4,25 @@ require_once(APPROOT.'collectors/src/vSphereCollector.class.inc.php');
 class vSphereVirtualMachineCollector extends vSphereCollector
 {
 	protected $idx;
-	protected $oCollectionPlan;
 	protected $oOSVersionLookup;
 	protected $oIPAddressLookup;
 	static protected $oOSFamilyMappings = null;
-	static protected $aVMInfos = null;
+    static protected bool $bVMInfosCollected = false;
+	static protected array $aVMInfos = [];
 	static protected $oOSVersionMappings = null;
+    static protected array $aLnkDatastoreToVM;
 
+    /**
+     * @inheritdoc
+     */
+    public function Init(): void
+    {
+        parent::Init();
 
-	/**
-	 * @inheritdoc
-	 */
-	public function Init(): void
-	{
-		parent::Init();
+        self::$aLnkDatastoreToVM = [];
+    }
 
-		$this->oCollectionPlan = vSphereCollectionPlan::GetPlan();
-	}
-
-	/**
+    /**
 	 * @inheritdoc
 	 */
 	public function AttributeIsOptional($sAttCode)
@@ -86,7 +86,8 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 
 	public static function GetVMs()
 	{
-		if (static::$aVMInfos === null) {
+		if (!static::$bVMInfosCollected) {
+            static::$bVMInfosCollected = true;
 			static::CollectVMInfos();
 		}
 
@@ -317,6 +318,16 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 			utils::Log(LOG_DEBUG, "    UUID: $sUUID");
 
 			$aData['uuid'] = $sUUID;
+
+            utils::Log(LOG_DEBUG, "Reading datastores...");
+            $aPerDatastoreUsage = $oVirtualMachine->storage->perDatastoreUsage;
+            foreach ($aPerDatastoreUsage as $aDatastoreUsage) {
+                self::$aLnkDatastoreToVM[] = [
+                    'datastore_id' => $aDatastoreUsage->datastore->getReferenceId(),
+                    'virtualmachine_id' => $sUUID
+                    ];
+            }
+
 		}
 
 		if ($oCollectionPlan->IsTeemIpInstalled()) {
@@ -417,7 +428,11 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		if (self::$oOSFamilyMappings === null) {
 			self::$oOSFamilyMappings = new MappingTable('os_family_mapping');
 		}
-		$sRawValue = $oVirtualMachine->config->guestFullName;
+        // Read the "real time" name. Take the one defined by config if it is not available.
+        $sRawValue = $oVirtualMachine->guest->guestFullName;
+        if (is_null($sRawValue)) {
+            $sRawValue = $oVirtualMachine->config->guestFullName;
+        }
 		$value = self::$oOSFamilyMappings->MapValue($sRawValue, '');
 
 		return $value;
@@ -436,13 +451,27 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		if (self::$oOSVersionMappings === null) {
 			self::$oOSVersionMappings = new MappingTable('os_version_mapping');
 		}
+        // Read the "real time" name. Take the one defined by config if it is not available.
 		$sRawValue = $oVirtualMachine->config->guestFullName;
 		$value = self::$oOSVersionMappings->MapValue($sRawValue, $sRawValue); // Keep the raw value by default
 
 		return $value;
 	}
 
-	public function Prepare()
+    /**
+     * Get the datastores attached to the VMs
+     *
+     * @return array
+     */
+    static public function GetDatastoreLnks()
+    {
+        return self::$aLnkDatastoreToVM;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function Prepare()
 	{
 		$bRet = parent::Prepare();
 		if (!$bRet) {
@@ -470,9 +499,6 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		return false;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function DoFetch($aVM)
 	{
 		$aData = array(

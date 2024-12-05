@@ -3,9 +3,11 @@ require_once(APPROOT.'collectors/src/vSphereCollector.class.inc.php');
 
 class vSphereHypervisorCollector extends vSphereCollector
 {
-	protected $idx;
-	protected $aHypervisorFields;
-	static protected $aHypervisors = null;
+	protected int $idx;
+	protected array $aHypervisorFields;
+    static protected bool $bHypervisorsCollected = false;
+	static protected array $aHypervisors = [];
+    static protected array $aLnkDatastoreToVHosts;
 
 	public function __construct()
 	{
@@ -13,9 +15,12 @@ class vSphereHypervisorCollector extends vSphereCollector
 		$aDefaultFields = array('primary_key', 'name', 'org_id', 'status', 'server_id', 'farm_id', 'uuid', 'hostid');
 		$aCustomFields = array_keys(static::GetCustomFields(__CLASS__));
 		$this->aHypervisorFields = array_merge($aDefaultFields, $aCustomFields);
-
+        self::$aLnkDatastoreToVHosts = [];
 	}
 
+    /**
+     * @inheritdoc
+     */
 	public function AttributeIsOptional($sAttCode)
 	{
 		if ($sAttCode == 'services_list') return true;
@@ -64,7 +69,8 @@ class vSphereHypervisorCollector extends vSphereCollector
 
 	public static function GetHypervisors()
 	{
-		if (self::$aHypervisors === null) {
+		if (!self::$bHypervisorsCollected) {
+            self::$bHypervisorsCollected = true;
 			$oBrandMappings = new MappingTable('brand_mapping');
 			$oModelMappings = new MappingTable('model_mapping');
 			$oOSFamilyMappings = new MappingTable('os_family_mapping');
@@ -94,7 +100,7 @@ class vSphereHypervisorCollector extends vSphereCollector
 			self::$aHypervisors = array();
 			$vhost = new \Vmwarephp\Vhost($sVSphereServer, $sLogin, $sPassword);
 
-			$aHypervisors = $vhost->findAllManagedObjects('HostSystem', array('hardware', 'summary'));
+			$aHypervisors = $vhost->findAllManagedObjects('HostSystem', array('datastore', 'hardware', 'summary'));
 
 			foreach ($aHypervisors as $oHypervisor) {
 				if ($oHypervisor->runtime->connectionState !== 'connected') {
@@ -157,6 +163,15 @@ class vSphereHypervisorCollector extends vSphereCollector
 				if ($oCollectionPlan->IsCbdVMwareDMInstalled()) {
 					$aHypervisorData['uuid'] = ($oHypervisor->hardware->systemInfo->uuid) ?? '';
 					$aHypervisorData['hostid'] = $oHypervisor->getReferenceId();
+
+                    utils::Log(LOG_DEBUG, "Reading datastores...");
+                    $aDatastores = $oHypervisor->datastore;
+                    foreach ($aDatastores as $aDatastore) {
+                        self::$aLnkDatastoreToVHosts[] = [
+                            'datastore_id' => $aDatastore->getReferenceId(),
+                            'virtualhost_id' => $aHypervisorData['name']
+                        ];
+                    }
 				}
 
 				// get extended CPU info
@@ -218,7 +233,20 @@ class vSphereHypervisorCollector extends vSphereCollector
 		return $value;
 	}
 
-	public function Prepare()
+    /**
+     * Get the datastores attached to the Hypervisor
+     *
+     * @return array
+     */
+    static public function GetDatastoreLnks()
+    {
+        return self::$aLnkDatastoreToVHosts;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function Prepare()
 	{
 		$bRet = parent::Prepare();
 		if (!$bRet) {
@@ -231,7 +259,9 @@ class vSphereHypervisorCollector extends vSphereCollector
 
 		return true;
 	}
-
+    /**
+     * @inheritdoc
+     */
 	public function Fetch()
 	{
 		if ($this->idx < count(self::$aHypervisors)) {
