@@ -1,5 +1,5 @@
 <?php
-require_once(APPROOT.'collectors/src/vSphereCollector.class.inc.php');
+require_once(APPROOT . 'collectors/src/vSphereCollector.class.inc.php');
 
 class vSphereVirtualMachineCollector extends vSphereCollector
 {
@@ -7,22 +7,22 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 	protected $oOSVersionLookup;
 	protected $oIPAddressLookup;
 	static protected $oOSFamilyMappings = null;
-    static protected bool $bVMInfosCollected = false;
+	static protected bool $bVMInfosCollected = false;
 	static protected array $aVMInfos = [];
 	static protected $oOSVersionMappings = null;
-    static protected array $aLnkDatastoreToVM;
+	static protected array $aLnkDatastoreToVM;
 
-    /**
-     * @inheritdoc
-     */
-    public function Init(): void
-    {
-        parent::Init();
+	/**
+	 * @inheritdoc
+	 */
+	public function Init(): void
+	{
+		parent::Init();
 
-        self::$aLnkDatastoreToVM = [];
-    }
+		self::$aLnkDatastoreToVM = [];
+	}
 
-    /**
+	/**
 	 * @inheritdoc
 	 */
 	public function AttributeIsOptional($sAttCode)
@@ -87,7 +87,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 	public static function GetVMs()
 	{
 		if (!static::$bVMInfosCollected) {
-            static::$bVMInfosCollected = true;
+			static::$bVMInfosCollected = true;
 			static::CollectVMInfos();
 		}
 
@@ -100,8 +100,8 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 	 */
 	static public function CollectVMInfos()
 	{
-		if (self::$aVMInfos === null) {
-			require_once APPROOT.'collectors/library/Vmwarephp/Autoloader.php';
+		if (empty(self::$aVMInfos)) {
+			require_once APPROOT . 'collectors/library/Vmwarephp/Autoloader.php';
 			$autoloader = new \Vmwarephp\Autoloader;
 			$autoloader->register();
 
@@ -117,7 +117,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 
 			$vhost = new \Vmwarephp\Vhost($sVSphereServer, $sLogin, $sPassword);
 
-			Utils::Log(LOG_DEBUG, "vSphere API type: ".$vhost->getApiType().", version: ".$vhost->getApiVersion());
+			Utils::Log(LOG_DEBUG, "vSphere API type: " . $vhost->getApiType() . ", version: " . $vhost->getApiVersion());
 
 			$aVLANs = array();
 			$aDVSwitches = $vhost->findAllManagedObjects('DistributedVirtualSwitch', array('portgroup', 'summary'));
@@ -131,7 +131,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 					}
 					foreach ($oSwitch->portgroup as $oPortGroup) {
 						$aVLANs[$oPortGroup->key] = $oPortGroup->name;
-						utils::Log(LOG_DEBUG, "Portgroup: {$oPortGroup->name}, config:\n".static::myprint_r($oPortGroup->config));
+						utils::Log(LOG_DEBUG, "Portgroup: {$oPortGroup->name}, config:\n" . static::myprint_r($oPortGroup->config));
 					}
 				}
 			}
@@ -140,7 +140,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 
 			$idx = 1;
 			foreach ($aVirtualMachines as $oVirtualMachine) {
-				utils::Log(LOG_DEBUG, ">>>>>> Starting collection of the VM '".$oVirtualMachine->name."' (VM #$idx)");
+				utils::Log(LOG_DEBUG, ">>>>>> Starting collection of the VM '" . $oVirtualMachine->name . "' (VM #$idx)");
 				$aVM = static::DoCollectVMInfo($aFarms, $oVirtualMachine, $aVLANs, $idx);
 				if ($aVM !== null) {
 					static::$aVMInfos[] = $aVM;
@@ -156,10 +156,10 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 
 	static protected function DoCollectVMInfo($aFarms, $oVirtualMachine, $aVLANs, $idx)
 	{
-		utils::Log(LOG_DEBUG, "Runtime->connectionState: ".$oVirtualMachine->runtime->connectionState);
-		utils::Log(LOG_DEBUG, "Runtime->powerState: ".$oVirtualMachine->runtime->powerState);
+		utils::Log(LOG_DEBUG, "Runtime->connectionState: " . $oVirtualMachine->runtime->connectionState);
+		utils::Log(LOG_DEBUG, "Runtime->powerState: " . $oVirtualMachine->runtime->powerState);
 		if ($oVirtualMachine->runtime->connectionState != 'connected') {
-			utils::Log(LOG_INFO, "Cannot retrieve information from VM ".$oVirtualMachine->name." (VM#$idx) (runtime->connectionState='".$oVirtualMachine->runtime->connectionState."'), skipping.");
+			utils::Log(LOG_INFO, "Cannot retrieve information from VM " . $oVirtualMachine->name . " (VM#$idx) (runtime->connectionState='" . $oVirtualMachine->runtime->connectionState . "'), skipping.");
 
 			return null;
 		}
@@ -181,9 +181,9 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 			$aMACToNetwork = array();
 			// The association MACAddress <=> Network is known at the HW level (correspondance between the VirtualINC and its "backing" device)
 			foreach ($oVirtualMachine->config->hardware->device as $oVirtualDevice) {
-                if ($oVirtualDevice === null) continue;
+				if ($oVirtualDevice === null) continue;
 
-				utils::Log(LOG_DEBUG, "Start collect for VM ".get_class($oVirtualDevice)."...");
+				utils::Log(LOG_DEBUG, "Start collect for VM " . get_class($oVirtualDevice) . "...");
 				switch (get_class($oVirtualDevice)) {
 					case 'VirtualE1000':
 					case 'VirtualE1000e':
@@ -208,20 +208,20 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 									} else {
 										if (isset($oBacking->port) && property_exists($oBacking, 'port')) {
 											$oPort = $oBacking->port;
-											utils::Log(LOG_DEBUG, "Virtual Network Device '".get_class($oBacking)."': has the following port (".get_class($oPort)."):\n".static::myprint_r($oPort));
+											utils::Log(LOG_DEBUG, "Virtual Network Device '" . get_class($oBacking) . "': has the following port (" . get_class($oPort) . "):\n" . static::myprint_r($oPort));
 											if (array_key_exists($oPort->portgroupKey, $aVLANs)) {
 												$sNetworkName = $aVLANs[$oPort->portgroupKey];
 											} else {
-												utils::Log(LOG_WARNING, "No VirtualPortGroup(key) found for the Virtual Network Device '".get_class($oBacking)."' with the following port (".get_class($oPort)."):\n".static::myprint_r($oPort));
+												utils::Log(LOG_WARNING, "No VirtualPortGroup(key) found for the Virtual Network Device '" . get_class($oBacking) . "' with the following port (" . get_class($oPort) . "):\n" . static::myprint_r($oPort));
 											}
 										} else {
-											utils::Log(LOG_DEBUG, "Virtual Network Device '".get_class($oBacking)."': has neither 'network', nor 'opaqueNetworkId', nor 'port'. Dumping the whole object:\n".static::myprint_r($oBacking));
+											utils::Log(LOG_DEBUG, "Virtual Network Device '" . get_class($oBacking) . "': has neither 'network', nor 'opaqueNetworkId', nor 'port'. Dumping the whole object:\n" . static::myprint_r($oBacking));
 										}
 									}
 								}
 							}
 						} else {
-							utils::Log(LOG_DEBUG, "Skip virtual device of class ".get_class($oVirtualDevice)." as we don't have access to its \"backing\" informations.");
+							utils::Log(LOG_DEBUG, "Skip virtual device of class " . get_class($oVirtualDevice) . " as we don't have access to its \"backing\" informations.");
 						}
 
 						if (isset($oVirtualDevice->macAddress)) {
@@ -233,13 +233,13 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 					default:
 						// Other types of Virtual Devices, skip
 				}
-				utils::Log(LOG_DEBUG, "End of collect for VM ".get_class($oVirtualDevice).".");
+				utils::Log(LOG_DEBUG, "End of collect for VM " . get_class($oVirtualDevice) . ".");
 			}
 
 			Utils::Log(LOG_DEBUG, "Collecting IP addresses for this VM...");
 			$aNWInterfaces = static::DoCollectVMIPs($aMACToNetwork, $oVirtualMachine);
 		} else {
-			utils::Log(LOG_DEBUG, "User cannot access to network information of VM ".$oVirtualMachine->name.", skipping.");
+			utils::Log(LOG_DEBUG, "User cannot access to network information of VM " . $oVirtualMachine->name . ", skipping.");
 		}
 
 		$aDisks = array();
@@ -286,10 +286,8 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 			// Get the farm that the hypervisor, on which this VM is running, is part of, if any
 			utils::Log(LOG_DEBUG, "Checking if the host is part of a Farm...");
 			$sFarmName = '';
-			foreach($aFarms as $aFarm)
-			{
-				if (in_array($oVirtualMachine->runtime->host->name, $aFarm['hosts']))
-				{
+			foreach ($aFarms as $aFarm) {
+				if (in_array($oVirtualMachine->runtime->host->name, $aFarm['hosts'])) {
 					$sFarmName = $aFarm['name'];
 					break; // Farm found
 				}
@@ -319,15 +317,14 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 
 			$aData['uuid'] = $sUUID;
 
-            utils::Log(LOG_DEBUG, "Reading datastores...");
-            $aPerDatastoreUsage = $oVirtualMachine->storage->perDatastoreUsage;
-            foreach ($aPerDatastoreUsage as $aDatastoreUsage) {
-                self::$aLnkDatastoreToVM[] = [
-                    'datastore_id' => $aDatastoreUsage->datastore->getReferenceId(),
-                    'virtualmachine_id' => $sUUID
-                    ];
-            }
-
+			utils::Log(LOG_DEBUG, "Reading datastores...");
+			$aPerDatastoreUsage = $oVirtualMachine->storage->perDatastoreUsage;
+			foreach ($aPerDatastoreUsage as $aDatastoreUsage) {
+				self::$aLnkDatastoreToVM[] = [
+					'datastore_id' => $aDatastoreUsage->datastore->getReferenceId(),
+					'virtualmachine_id' => $sUUID
+				];
+			}
 		}
 
 		if ($oCollectionPlan->IsTeemIpInstalled()) {
@@ -351,7 +348,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 			}
 
 			$aData['managementip_id'] = $sGuestIP;
-			utils::Log(LOG_DEBUG, "Setting managementip_id: ".$sGuestIP);
+			utils::Log(LOG_DEBUG, "Setting managementip_id: " . $sGuestIP);
 			$aData['short_name'] = $sGuestShortName;
 
 			if ($oCollectionPlan->IsMonitoringExtensionInstalled()) {
@@ -364,7 +361,6 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		}
 
 		return $aData;
-
 	}
 
 	static protected function DoCollectVMIPs($aMACToNetwork, $oVirtualMachine)
@@ -428,11 +424,11 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		if (self::$oOSFamilyMappings === null) {
 			self::$oOSFamilyMappings = new MappingTable('os_family_mapping');
 		}
-        // Read the "real time" name. Take the one defined by config if it is not available.
-        $sRawValue = $oVirtualMachine->guest->guestFullName;
-        if (is_null($sRawValue)) {
-            $sRawValue = $oVirtualMachine->config->guestFullName;
-        }
+		// Read the "real time" name. Take the one defined by config if it is not available.
+		$sRawValue = $oVirtualMachine->guest->guestFullName;
+		if (is_null($sRawValue)) {
+			$sRawValue = $oVirtualMachine->config->guestFullName;
+		}
 		$value = self::$oOSFamilyMappings->MapValue($sRawValue, '');
 
 		return $value;
@@ -451,27 +447,27 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		if (self::$oOSVersionMappings === null) {
 			self::$oOSVersionMappings = new MappingTable('os_version_mapping');
 		}
-        // Read the "real time" name. Take the one defined by config if it is not available.
+		// Read the "real time" name. Take the one defined by config if it is not available.
 		$sRawValue = $oVirtualMachine->config->guestFullName;
 		$value = self::$oOSVersionMappings->MapValue($sRawValue, $sRawValue); // Keep the raw value by default
 
 		return $value;
 	}
 
-    /**
-     * Get the datastores attached to the VMs
-     *
-     * @return array
-     */
-    static public function GetDatastoreLnks()
-    {
-        return self::$aLnkDatastoreToVM;
-    }
+	/**
+	 * Get the datastores attached to the VMs
+	 *
+	 * @return array
+	 */
+	static public function GetDatastoreLnks()
+	{
+		return self::$aLnkDatastoreToVM;
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function Prepare()
+	/**
+	 * @inheritdoc
+	 */
+	public function Prepare()
 	{
 		$bRet = parent::Prepare();
 		if (!$bRet) {
