@@ -121,6 +121,9 @@ class vSphereHypervisorCollector extends vSphereCollector
 					}
 				}
 
+				// get the Hypervisor name and only use the hostname (it might be FQDN)
+				$sSeverName = static::extractHostname($oHypervisor->name);
+
 				// get the serial number is not that easy...
 				$sSerialNumber = 'unknown';
 				foreach ($oHypervisor->hardware->systemInfo->otherIdentifyingInfo as $oTstSN) {
@@ -144,7 +147,7 @@ class vSphereHypervisorCollector extends vSphereCollector
 				$aHypervisorData = array(
 					'id' => $oHypervisor->getReferenceId(),
 					'primary_key' => $oHypervisor->getReferenceId(),
-					'name' => $oHypervisor->name,
+					'name' => $sSeverName,
 					'org_id' => $sDefaultOrg,
 					'brand_id' => $oBrandMappings->MapValue($oHypervisor->hardware->systemInfo->vendor, 'Other'),
 					'model_id' => $oModelMappings->MapValue($oHypervisor->hardware->systemInfo->model, ''),
@@ -154,7 +157,7 @@ class vSphereHypervisorCollector extends vSphereCollector
 					'osversion_id' => $oOSVersionMappings->MapValue($oHypervisor->config->product->fullName, ''),
 					'status' => 'production',
 					'farm_id' => $sFarmName,
-					'server_id' => $oHypervisor->name,
+					'server_id' => $sSeverName,
 					'serialnumber' => $sSerialNumber,
 					'managementip' => $sManagementIp,
 				);

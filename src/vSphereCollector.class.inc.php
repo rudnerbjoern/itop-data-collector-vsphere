@@ -46,6 +46,30 @@ class vSphereCollector extends ConfigurableCollector
 	}
 
 	/**
+	 * Helper to extract hostname and domain
+	 * Also handel IP addresses
+	 *
+	 * @param string $fqdn FQDN to extract hostname from
+	 * @return string sanitized hostname
+	 */
+	protected static function extractHostname(string $fqdn): string
+	{
+		if (filter_var($fqdn, FILTER_VALIDATE_IP)) {
+			// fqdn is an IP address
+			return $fqdn;
+		}
+
+		$parts = explode('.', $fqdn, 2);
+		if (count($parts) === 2) {
+			// fqdn contains hostname and domain
+			return $parts[0];
+		}
+
+		// fqdn contains already sanitized hostname
+		return  $fqdn;
+	}
+
+	/**
 	 * Check the SSL connection to the given host
 	 *
 	 * @param string $sHost The host/uri to connect to (e.g. 192.168.10.12:443)

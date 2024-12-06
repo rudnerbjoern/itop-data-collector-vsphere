@@ -71,7 +71,7 @@ class vSphereIPv6AddressCollector extends vSphereCollector
 				if (filter_var($sIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
 					Utils::Log(LOG_DEBUG, 'IPv6 Address: ' . $sIP);
 					if (in_array('short_name', $oVM)) {
-						$sShortName = explode('.', $oVM['short_name'])[0];  // Remove chars after '.', if any
+						$sShortName = static::extractHostname($oVM['short_name']);
 					} else {
 						$sShortName = '';
 					}

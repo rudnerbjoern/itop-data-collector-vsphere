@@ -277,7 +277,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		utils::Log(LOG_DEBUG, "    Management IP: $sGuestIP");
 
 		utils::Log(LOG_DEBUG, "Reading host name...");
-		$sHostName = $oVirtualMachine->runtime->host->name;
+		$sHostName = static::extractHostname($oVirtualMachine->runtime->host->name);
 		utils::Log(LOG_DEBUG, "    Host name: $sHostName");
 
 		if ($sVirtualHostType == 'hypervisor') {
