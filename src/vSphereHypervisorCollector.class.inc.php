@@ -129,6 +129,7 @@ class vSphereHypervisorCollector extends vSphereCollector
 				foreach ($oHypervisor->hardware->systemInfo->otherIdentifyingInfo as $oTstSN) {
 					if ($oTstSN->identifierType->key == 'SerialNumberTag') {
 						$sSerialNumber = $oTstSN->identifierValue;
+						break;
 					}
 				}
 
@@ -152,6 +153,8 @@ class vSphereHypervisorCollector extends vSphereCollector
 					'brand_id' => $oBrandMappings->MapValue($oHypervisor->hardware->systemInfo->vendor, 'Other'),
 					'model_id' => $oModelMappings->MapValue($oHypervisor->hardware->systemInfo->model, ''),
 					'cpu' => ($oHypervisor->hardware->cpuInfo->$sVMCPUAttribute) ?? '',
+					'cpu_sockets' => '',
+					'cpu_cores' => '',
 					'ram' => (int)($oHypervisor->hardware->memorySize / (1024*1024)),
 					'osfamily_id' => $oOSFamilyMappings->MapValue($oHypervisor->config->product->name, 'Other'),
 					'osversion_id' => $oOSVersionMappings->MapValue($oHypervisor->config->product->fullName, ''),
