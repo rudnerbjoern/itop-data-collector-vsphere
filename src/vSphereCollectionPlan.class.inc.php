@@ -14,9 +14,10 @@ class vSphereCollectionPlan extends CollectionPlan
 	private $sDefaultIpStatus;
 	private $bManageIpv6;
 	private $bManageLogicalInterfaces;
-	private $bBRCostCenterIsInstalled;
-	private $bCpuExtensionIsInstalled;
-	private $bMonitoringExtensionIsInstalled;
+	private $bLookupIpsWithOrganization;
+	private bool $bBRCostCenterIsInstalled = false;
+	private bool $bCpuExtensionIsInstalled = false;
+	private bool $bMonitoringExtensionIsInstalled = false;
 
 	/**
 	 * @inheritdoc
@@ -76,7 +77,6 @@ class vSphereCollectionPlan extends CollectionPlan
 
 		// Check if CPU extension is installed
 		Utils::Log(LOG_INFO, '---------- Check CPU Extension installation ----------');
-		$this->bCpuExtensionIsInstalled = false;
 		$oRestClient = new RestClient();
 		try {
 			$aResult = $oRestClient->Get('ModuleInstallation', 'SELECT ModuleInstallation WHERE name = \'br-cpu-extension\'', 'version, installed');
@@ -96,7 +96,6 @@ class vSphereCollectionPlan extends CollectionPlan
 
 		// Check if Monitoring extension is installed
 		Utils::Log(LOG_INFO, '---------- Check Monitoring Extension installation ----------');
-		$this->bMonitoringExtensionIsInstalled = false;
 		$oRestClient = new RestClient();
 		try {
 			$aResult = $oRestClient->Get('ModuleInstallation', 'SELECT ModuleInstallation WHERE name = \'br-monitoring\'', 'version, installed');
@@ -116,7 +115,6 @@ class vSphereCollectionPlan extends CollectionPlan
 
 		// Check if CostCenter is installed
 		Utils::Log(LOG_INFO, '---------- Check Data model for CostCenter installation ----------');
-		$this->bBRCostCenterIsInstalled = false;
 		$oRestClient = new RestClient();
 		try {
 			$aResult = $oRestClient->Get('CostCenter', 'SELECT CostCenter WHERE id = 0');
@@ -166,6 +164,7 @@ class vSphereCollectionPlan extends CollectionPlan
 				$this->sDefaultIpStatus = array_key_exists('default_ip_status', $aTeemIpDiscovery) ? $aTeemIpDiscovery['default_ip_status'] : 'allocated';
 				$this->bManageIpv6 = array_key_exists('manage_ipv6', $aTeemIpDiscovery) ? $aTeemIpDiscovery['manage_ipv6'] : 'no';
 				$this->bManageLogicalInterfaces = array_key_exists('manage_logical_interfaces', $aTeemIpDiscovery) ? $aTeemIpDiscovery['manage_logical_interfaces'] : 'no';
+				$this->bLookupIpsWithOrganization =  array_key_exists('lookup_ips_with_organization', $aTeemIpDiscovery) ? $aTeemIpDiscovery['lookup_ips_with_organization'] : 'no';
 
 				// Detects TeemIp's version
 				$oRestClient = new RestClient();
@@ -358,6 +357,8 @@ class vSphereCollectionPlan extends CollectionPlan
 				return ($this->bManageIpv6 == 'yes') ? true : false;
 			case 'manage_logical_interfaces':
 				return ($this->bManageLogicalInterfaces == 'yes') ? true : false;
+			case 'lookup_ips_with_organization':
+				return ($this->bLookupIpsWithOrganization == 'yes') ? true : false;
 			default:
 				return false;
 		}
