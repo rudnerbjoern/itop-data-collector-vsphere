@@ -84,23 +84,14 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		return parent::AttributeIsOptional($sAttCode);
 	}
 
-	public static function GetVMs()
-	{
-		if (!static::$bVMInfosCollected) {
-			static::$bVMInfosCollected = true;
-			static::CollectVMInfos();
-		}
-
-		return static::$aVMInfos;
-	}
-
 	/**
 	 * Helper method to perform the actual collection of VMs and their related information (OSFamily, OSVersion...)
 	 * and store the result in a static variable for further processing by the different collectors
 	 */
 	static public function CollectVMInfos()
 	{
-		if (empty(self::$aVMInfos)) {
+		if (!static::$bVMInfosCollected) {
+			static::$bVMInfosCollected = true;
 			require_once APPROOT . 'collectors/library/Vmwarephp/Autoloader.php';
 			$autoloader = new \Vmwarephp\Autoloader;
 			$autoloader->register();
@@ -175,8 +166,7 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 
 		utils::Log(LOG_DEBUG, "Collecting network info...");
 		$aNWInterfaces = array();
-		// Make sure user has access to network information - see bug N°6888
-		// HACK: only check for guest->net as guest might be empty
+		// Make sure user has access to network information
 		if (isset($oVirtualMachine->guest->net)) {
 			$aMACToNetwork = array();
 			// The association MACAddress <=> Network is known at the HW level (correspondance between the VirtualINC and its "backing" device)
