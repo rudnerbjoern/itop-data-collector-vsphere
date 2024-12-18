@@ -537,7 +537,11 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		$this->oOSVersionLookup = new LookupTable('SELECT OSVersion', array('osfamily_id_friendlyname', 'name'));
 
 		if ($this->oCollectionPlan->IsTeemIpInstalled()) {
-			$this->oIPAddressLookup = new LookupTable('SELECT IPAddress', array('org_name', 'friendlyname'));
+			if ($this->oCollectionPlan->GetTeemIpOption('lookup_ips_with_organization')) {
+				$this->oIPAddressLookup = new LookupTable('SELECT IPAddress', array('org_name', 'friendlyname'));
+			} else {
+				$this->oIPAddressLookup = new LookupTable('SELECT IPAddress', array('friendlyname'));
+			}
 		}
 	}
 
@@ -549,9 +553,17 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 		// Process each line of the CSV
 		$this->oOSVersionLookup->Lookup($aLineData, array('osfamily_id', 'osversion_id'), 'osversion_id', $iLineIndex);
 		if ($this->oCollectionPlan->IsTeemIpInstalled()) {
-			$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'managementip_id'), 'managementip_id', $iLineIndex);
+			if ($this->oCollectionPlan->GetTeemIpOption('lookup_ips_with_organization')) {
+				$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'managementip_id'), 'managementip_id', $iLineIndex);
+			} else {
+				$this->oIPAddressLookup->Lookup($aLineData, array('managementip_id'), 'managementip_id', $iLineIndex);
+			}
 			if ($this->oCollectionPlan->IsMonitoringExtensionInstalled()) {
-				$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'monitoringip_id'), 'monitoringip_id', $iLineIndex);
+				if ($this->oCollectionPlan->GetTeemIpOption('lookup_ips_with_organization')) {
+					$this->oIPAddressLookup->Lookup($aLineData, array('org_id', 'monitoringip_id'), 'monitoringip_id', $iLineIndex);
+				} else {
+					$this->oIPAddressLookup->Lookup($aLineData, array('monitoringip_id'), 'monitoringip_id', $iLineIndex);
+				}
 			}
 		}
 	}

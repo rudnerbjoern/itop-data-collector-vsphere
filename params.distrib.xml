@@ -18,6 +18,8 @@
 
 	<!-- Default values -->
 	<default_org_id>Demo</default_org_id>
+<!-- If IP Addresses are handled in another Organization -->
+<default_ipv4_org_id>Demo</default_ipv4_org_id>
 	<hypervisor type="hash">
 		<!-- Define what VM's attribute to use as cpu attribute within iTop's datamodel.
 		    numCpuPackages was used before -->
@@ -140,6 +142,7 @@
 		<default_ip_status>allocated</default_ip_status>
 		<manage_ipv6>yes</manage_ipv6>
 		<manage_logical_interfaces>yes</manage_logical_interfaces>
+<lookup_ips_with_organization>yes</lookup_ips_with_organization>
 	</teemip_discovery>
 
 	<!-- Mapping tables -->
