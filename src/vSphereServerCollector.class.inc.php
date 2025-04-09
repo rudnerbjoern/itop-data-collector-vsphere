@@ -1,5 +1,5 @@
 <?php
-require_once(APPROOT.'collectors/src/vSphereCollector.class.inc.php');
+require_once(APPROOT . 'collectors/src/vSphereCollector.class.inc.php');
 
 class vSphereServerCollector extends vSphereCollector
 {
@@ -164,7 +164,7 @@ class vSphereServerCollector extends vSphereCollector
 
 		// Add the custom fields (if any)
 		foreach (vSphereHypervisorCollector::GetCustomFields(__CLASS__) as $sAttCode => $sFieldDefinition) {
-			$aData[$sAttCode] = $aHyperV['server-custom-'.$sAttCode];
+			$aData[$sAttCode] = $aHyperV['server-custom-' . $sAttCode];
 		}
 
 		$oCollectionPlan = vSphereCollectionPlan::GetPlan();

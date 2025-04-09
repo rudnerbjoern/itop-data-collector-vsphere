@@ -5,40 +5,29 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 {
 	protected $idx;
 	protected $oVMLookup;
-    static protected bool $bLogicalInterfacesCollected = false;
+	static protected bool $bLogicalInterfacesCollected = false;
 	static protected array $aLogicalInterfaces = [];
-    static protected bool $bLnkLogicalInterfaceToIPAddressCollected = false;
+	static protected bool $bLnkLogicalInterfaceToIPAddressCollected = false;
 	static protected array $aLnkLogicalInterfaceToIPAddress = [];
-
-	/**
-	 * @inheritdoc
-	 */
-	public function CheckToLaunch(array $aOrchestratedCollectors): bool
-	{
-		if (parent::CheckToLaunch($aOrchestratedCollectors)) {
-			if ($this->oCollectionPlan->IsTeemIpInstalled() && $this->oCollectionPlan->GetTeemIpOption('collect_ips') && $this->oCollectionPlan->GetTeemIpOption('manage_logical_interfaces')) {
-				return true;
-			} else {
-				Utils::Log(LOG_INFO, '> vSphereIPv4AddressCollector will not be launched as TeemIP is not installed, IPs should not be collected or logical interfaces should not be managed');
-			}
-		}
-
-		return false;
-	}
-
 
 	/**
 	 * @inheritdoc
 	 */
 	public function AttributeIsOptional($sAttCode)
 	{
-		if ($sAttCode == 'interfacespeed_id') return ($this->oCollectionPlan->IsTeemIpNMEInstalled()) ? false : true;
-		if ($sAttCode == 'ip_list') return true;
-		if ($sAttCode == 'layer2protocol_id') return ($this->oCollectionPlan->IsTeemIpNMEInstalled()) ? false : true;
-		if ($sAttCode == 'speed') return ($this->oCollectionPlan->IsTeemIpNMEInstalled()) ? true : false;
-		if ($sAttCode == 'status') return true;
-		if ($sAttCode == 'vlans_list') return true;
-		if ($sAttCode == 'vrfs_list') return true;
+        if ($this->oCollectionPlan->IsTeemIpInstalled()) {
+            if ($sAttCode == 'ipaddress') return true;
+            if ($sAttCode == 'ipgateway') return true;
+            if ($sAttCode == 'ipmask') return true;
+            if ($sAttCode == 'speed') return true;
+        } else {
+            if ($sAttCode == 'interfacespeed_id') return true;
+            if ($sAttCode == 'ip_list') return true;
+            if ($sAttCode == 'layer2protocol_id') return true;
+            if ($sAttCode == 'status') return true;
+            if ($sAttCode == 'vlans_list') return true;
+            if ($sAttCode == 'vrfs_list') return true;
+        }
 
 		// Monitoring is optional
 		if ($sAttCode == 'monitoringstatus') return true;
@@ -50,7 +39,7 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 	static public function GetLogicalInterfaces()
 	{
 		if (!self::$bLogicalInterfacesCollected) {
-            self::$bLogicalInterfacesCollected = true;
+			self::$bLogicalInterfacesCollected = true;
 			$aVMs = vSphereVirtualMachineCollector::CollectVMInfos();
 
 			$aLogicalInterfaces = array();
@@ -64,7 +53,7 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 						'name' => $oInterface['network'],
 						'virtualmachine_orgid' => $oVM['org_id'],
 						'virtualmachine_id' => $oVM['name'],
-						'ip' => $oInterface['ip'],
+						'ip' => $oInterface['ip'] ?? '',
 					);
 				}
 			}
@@ -80,13 +69,16 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 						'name' => $aValue['name'],
 						'virtualmachine_orgid' => $aValue['virtualmachine_orgid'],
 						'virtualmachine_id' => $aValue['virtualmachine_id'],
+                        'ip' => $aValue['ip'],
 					);
 				}
 
-				$aLnkLogicalInterfaceToIPAddress[] = array(
-					'ipinterface_id' => $aValue['macaddress'],
-					'ipaddress_id' => $aValue['ip'],
-				);
+                if (!empty($aValue['ip'])) {
+                    $aLnkLogicalInterfaceToIPAddress[] = array(
+                        'ipinterface_id' => $aValue['macaddress'],
+                        'ipaddress_id' => $aValue['ip'],
+                    );
+                }
 			}
 
 			self::$aLogicalInterfaces = $aFinalLogicalInterfaces;
@@ -99,7 +91,7 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 	static public function GetLnks()
 	{
 		if (!self::$bLnkLogicalInterfaceToIPAddressCollected) {
-            self::$bLnkLogicalInterfaceToIPAddressCollected = true;
+			self::$bLnkLogicalInterfaceToIPAddressCollected = true;
 			self::GetLogicalInterfaces();
 		}
 
@@ -140,12 +132,23 @@ class vSphereLogicalInterfaceCollector extends vSphereCollector
 		if ($this->idx < count(self::$aLogicalInterfaces)) {
 			$aLogicalInterfaces = self::$aLogicalInterfaces[$this->idx++];
 
-			return array(
-				'primary_key' => $aLogicalInterfaces['macaddress'],
-				'macaddress' => $aLogicalInterfaces['macaddress'],
-				'name' => $aLogicalInterfaces['name'],
-				'virtualmachine_id' => $aLogicalInterfaces['virtualmachine_id'],
-			);
+            if ($this->oCollectionPlan->IsTeemIpInstalled()) {
+                return array(
+                    'primary_key' => $aLogicalInterfaces['macaddress'],
+                    'macaddress' => $aLogicalInterfaces['macaddress'],
+                    'name' => $aLogicalInterfaces['name'],
+                    'virtualmachine_id' => $aLogicalInterfaces['virtualmachine_id'],
+                );
+
+            } else {
+                return array(
+                    'primary_key' => $aLogicalInterfaces['macaddress'],
+                    'ipaddress' => $aLogicalInterfaces['ip'],
+                    'macaddress' => $aLogicalInterfaces['macaddress'],
+                    'name' => $aLogicalInterfaces['name'],
+                    'virtualmachine_id' => $aLogicalInterfaces['virtualmachine_id'],
+                );
+            }
 		}
 
 		return false;

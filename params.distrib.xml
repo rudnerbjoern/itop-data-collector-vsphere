@@ -6,14 +6,14 @@
 	<vsphere_login>admin</vsphere_login>
 	<vsphere_password>admin</vsphere_password>
 	<vsphere_connection_options type="hash">
-	    <ssl type="hash">
-	        <!--  uncomment the lines below to disable SSL Certificates validation
-	              see http://php.net/manual/en/context.ssl.php for the possible options
-	        <verify_peer>0</verify_peer>
-	        <verify_peer_name>0</verify_peer_name>
-	        <allow_self_signed>1</allow_self_signed>
-	         -->
-	    </ssl>
+		<ssl type="hash">
+			<!--  uncomment the lines below to disable SSL Certificates validation
+				  see http://php.net/manual/en/context.ssl.php for the possible options
+			<verify_peer>0</verify_peer>
+			<verify_peer_name>0</verify_peer_name>
+			<allow_self_signed>1</allow_self_signed>
+			-->
+		</ssl>
 	</vsphere_connection_options>
 
 	<!-- Default values -->
@@ -30,6 +30,10 @@
 			This option forces the VM's virtual host to point to the VM's hypervisor
 			Allowed values: hypervisor, farm (default) -->
 		<virtual_host>farm</virtual_host>
+		<get_network_interfaces_from_hardware_info>yes</get_network_interfaces_from_hardware_info>
+		<get_network_interfaces_from_network_info>yes</get_network_interfaces_from_network_info>
+		<default_interface_network_name>Internal</default_interface_network_name>
+		<record_interface_number>yes</record_interface_number>
 	</virtual_machine>
 
 	<!-- Class collection sequence -->
@@ -57,6 +61,18 @@
 			<name>vSphereOSVersionCollector</name>
 		    <enable>yes</enable>
 			<rank>4</rank>
+		</collector>
+		<!-- IPv4 Addresses -->
+		<collector>
+			<name>vSphereIPv4AddressCollector</name>
+		    <enable>yes</enable>
+			<rank>7</rank>
+		</collector>
+		<!-- IPv6 Addresses -->
+		<collector>
+			<name>vSphereIPv6AddressCollector</name>
+		    <enable>yes</enable>
+			<rank>8</rank>
 		</collector>
 		<!-- Farms -->
 		<collector>
@@ -87,18 +103,6 @@
 			<name>vSphereLogicalInterfaceCollector</name>
 		    <enable>yes</enable>
 			<rank>14</rank>
-		</collector>
-		<!-- IPv4 Addresses -->
-		<collector>
-			<name>vSphereIPv4AddressCollector</name>
-		    <enable>yes</enable>
-			<rank>20</rank>
-		</collector>
-		<!-- IPv6 Addresses -->
-		<collector>
-			<name>vSphereIPv6AddressCollector</name>
-		    <enable>yes</enable>
-			<rank>21</rank>
 		</collector>
 		<!-- Lnks IP Interface to IP Address -->
 		<collector>
@@ -147,14 +151,13 @@
 
 	<!-- Mapping tables -->
 	<brand_mapping type="array">
-    <!-- Syntax /pattern/replacement where:
-      any delimiter can be used (not only /) but the delimiter cannot be present in the "replacement" string
-      pattern is a RegExpr pattern
-      replacement is a sprintf string in which:
-          %1$s will be replaced by the whole matched text,
-          %2$s will be replaced by the first match group, if any group is defined in the RegExpr
-          %3$s will be replaced by the second matched group, etc...
-    -->
+		<!-- Syntax /pattern/replacement where:
+			  any delimiter can be used (not only /) but the delimiter cannot be present in the "replacement" string
+			  pattern is a RegExpr pattern
+				%1$s will be replaced by the whole matched text,
+				%2$s will be replaced by the first match group, if any group is defined in the RegExpr
+				%3$s will be replaced by the second matched group, etc...
+		-->
 		<pattern>/IBM/IBM</pattern>
 		<pattern>/Hewlett Packard/Hewlett-Packard</pattern>
 		<pattern>/Hewlett-Packard/Hewlett-Packard</pattern><pattern>/Dell/Dell</pattern>
@@ -174,4 +177,10 @@
 	<os_version_mapping type="array">
 		<pattern>/.*/%1$s</pattern>
 	</os_version_mapping>
+	<vm_power_state_mapping type="array">
+		<pattern>/poweredOn/On</pattern>
+		<pattern>/poweredOff/Off</pattern>
+		<pattern>/suspended/Suspended</pattern>
+		<pattern>/.*/On</pattern>
+	</vm_power_state_mapping>
 </parameters>
