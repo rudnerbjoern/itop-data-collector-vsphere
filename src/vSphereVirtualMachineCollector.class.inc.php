@@ -6,13 +6,12 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 	protected $idx;
 	protected $oOSVersionLookup;
 	protected $oIPAddressLookup;
-	static protected $oOSFamilyMappings = null;
 	static protected bool $bVMInfosCollected = false;
 	static protected array $aVMInfos = [];
+	static protected array $aLnkDatastoreToVM;
 	static protected $oOSFamilyMappings = null;
 	static protected $oOSVersionMappings = null;
 	static protected $oPowerStateMappings = null;
-	static protected array $aLnkDatastoreToVM;
 
 	/**
 	 * @inheritdoc
@@ -555,9 +554,9 @@ class vSphereVirtualMachineCollector extends vSphereCollector
 	 */
 	public function Fetch()
 	{
-        if (is_null(static::$aVMInfos)) {
-            return false;
-        }
+		if (is_null(static::$aVMInfos)) {
+			return false;
+		}
 		if ($this->idx < count(static::$aVMInfos)) {
 			$aVM = static::$aVMInfos[$this->idx++];
 
