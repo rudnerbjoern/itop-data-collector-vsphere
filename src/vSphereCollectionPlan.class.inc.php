@@ -47,7 +47,7 @@ class vSphereCollectionPlan extends CollectionPlan
 		Utils::Log(LOG_INFO, '---------- Check Virtualization Management Module installation ----------');
 		$this->bVirtualizationMgtIsInstalled = false;
 		try {
-			$aResult = $oRestClient->Get('ModuleInstallation', ['name' => 'itop-virtualization-mgmt', 'installed' => $sLastInstallDate], 'version, installed', 1);
+            $aResult = $oRestClient->Get('ModuleInstallation', "SELECT ModuleInstallation WHERE name = 'iTop-virtualization-mgmt' AND installed >= '$sLastInstallDate'", 'version, installed', 1);
 			if (array_key_exists('objects', $aResult) && isset($aResult['objects'])) {
 				$this->bVirtualizationMgtIsInstalled = true;
 				$aObject = current($aResult['objects']);
@@ -70,7 +70,7 @@ class vSphereCollectionPlan extends CollectionPlan
 		Utils::Log(LOG_INFO, '---------- Check Data model for vSphere installation ----------');
 		$this->bCbdVMwareDMIsInstalled = false;
 		try {
-			$aResult = $oRestClient->Get('ModuleInstallation', ['name' => 'combodo-vsphere-datamodel', 'installed' => $sLastInstallDate], 'version, installed', 1);
+            $aResult = $oRestClient->Get('ModuleInstallation', "SELECT ModuleInstallation WHERE name = 'combodo-vsphere-datamodel' AND installed >= '$sLastInstallDate'", 'version, installed', 1);
 			if (array_key_exists('objects', $aResult) && isset($aResult['objects'])) {
 				$this->bCbdVMwareDMIsInstalled = true;
 				$aObject = current($aResult['objects']);
@@ -150,7 +150,7 @@ class vSphereCollectionPlan extends CollectionPlan
 		Utils::Log(LOG_INFO, '---------- Check TeemIp installation ----------');
 		$this->bTeemIpIsInstalled = false;
 		try {
-			$aResult = $oRestClient->Get('ModuleInstallation', ['name' => 'teemip-ip-mgmt', 'installed' => $sLastInstallDate], 'version, installed', 1);
+            $aResult = $oRestClient->Get('ModuleInstallation', "SELECT ModuleInstallation WHERE name = 'teemip-ip-mgmt' AND installed >= '$sLastInstallDate'", 'version, installed', 1);
 			if (array_key_exists('objects', $aResult) && isset($aResult['objects'])) {
 				$this->bTeemIpIsInstalled = true;
 				$aObject = current($aResult['objects']);
@@ -185,7 +185,7 @@ class vSphereCollectionPlan extends CollectionPlan
 			// Check if TeemIp IpDiscovery is installed or not
 			$oRestClient = new RestClient();
 			try {
-				$aResult = $oRestClient->Get('ModuleInstallation', ['name' => 'teemip-ip-discovery', 'installed' => $sLastInstallDate], 'version, installed', 1);
+                $aResult = $oRestClient->Get('ModuleInstallation', "SELECT ModuleInstallation WHERE name = 'teemip-ip-discovery' AND installed >= '$sLastInstallDate'", 'version, installed', 1);
 				if (array_key_exists('objects', $aResult) && isset($aResult['objects'])) {
 					$this->bTeemIpIpDiscoveryIsInstalled = true;
 					Utils::Log(LOG_INFO, 'TeemIp IP Discovery is installed');
@@ -203,7 +203,7 @@ class vSphereCollectionPlan extends CollectionPlan
 			// Check if TeemIp Network Management Extended is installed or not
 			$oRestClient = new RestClient();
 			try {
-				$aResult = $oRestClient->Get('ModuleInstallation', ['name' => 'teemip-network-mgmt-extended', 'installed' => $sLastInstallDate], 'version, installed', 1);
+                $aResult = $oRestClient->Get('ModuleInstallation', "SELECT ModuleInstallation WHERE name = 'teemip-network-mgmt-extended' AND installed >= '$sLastInstallDate'", 'version, installed', 1);
 				if (array_key_exists('objects', $aResult) && isset($aResult['objects'])) {
 					$this->bTeemIpNMEIsInstalled = true;
 					Utils::Log(LOG_INFO, 'TeemIp Network Management Extended is installed');
@@ -221,7 +221,7 @@ class vSphereCollectionPlan extends CollectionPlan
 			// Check if TeemIp Zone Management is installed or not
 			$oRestClient = new RestClient();
 			try {
-				$aResult = $oRestClient->Get('ModuleInstallation', ['name' => 'teemip-zone-mgmt', 'installed' => $sLastInstallDate], 'version, installed', 1);
+                $aResult = $oRestClient->Get('ModuleInstallation', "SELECT ModuleInstallation WHERE name = 'teemip-zone-mgmt' AND installed >= '$sLastInstallDate'", 'version, installed', 1);
 				if (array_key_exists('objects', $aResult) && isset($aResult['objects'])) {
 					$this->bTeemIpZoneMgmtIsInstalled = true;
 					Utils::Log(LOG_INFO, 'TeemIp Zone Management extension is installed');
